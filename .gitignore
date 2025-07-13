@@ -6,6 +6,7 @@
 /live-commerce-manager-backend/build/
 /live-commerce-manager-backend/.gradle/
 /live-commerce-manager-backend/logs/
+/live-commerce-manager-backend/bin/
 
 # 공통
 *.log
