@@ -82,6 +82,12 @@ dependencies {
     // HTTP Client (필요 시 주석 해제)
     // implementation 'org.apache.httpcomponents.client5:httpclient5:5.2.3'
     // implementation 'org.apache.httpcomponents.client5:httpmime5:5.2.3'
+    
+    
+}
+
+  configurations.all {
+    exclude group: 'org.slf4j', module: 'slf4j-simple'
 }
 
 tasks.named('test') {
