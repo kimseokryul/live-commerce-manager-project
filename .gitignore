@@ -8,7 +8,12 @@
 /live-commerce-manager-backend/logs/
 /live-commerce-manager-backend/bin/
 
+# backend - 빌드/캐시 추가 무시 대상
+/live-commerce-manager-backend/problems-report.html
+/live-commerce-manager-backend/**/*.class
+
 # 공통
 *.log
+*.html
 .env
 .DS_Store
