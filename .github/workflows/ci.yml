@@ -38,7 +38,7 @@ jobs:
       
       - name: Install dependencies
         working-directory: live-commerce-manager-frontend
-        run: npm Install
+        run: npm install
       
       - name: Build frontend
         working-directory: live-commerce-manager-frontend
