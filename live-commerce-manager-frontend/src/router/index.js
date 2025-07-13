@@ -30,7 +30,7 @@ import WidthdrawnUserList from '../components/admin/WidthdrawnUserList.vue'
 
 import SellerSales from '../components/seller/sales/SellerSales.vue'
 
-const Login = () => import('@/components/login/login.vue')
+const Login = () => import('@/components/login/Login.vue')
 const Register = () => import('@/components/host/register.vue')
 const FindId = () => import('@/components/login/FindId.vue')
 const FindPassword = () => import('@/components/login/FindPasswordStep1.vue')
