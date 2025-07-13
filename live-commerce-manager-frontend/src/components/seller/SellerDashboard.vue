@@ -26,6 +26,8 @@ const cancel = ref(0)
 const returnCount = ref(0)
 const exchange = ref(0)
 
+const grade_id = ref('')
+
 onMounted(async () => {
   const token = localStorage.getItem('jwt') || sessionStorage.getItem('jwt')
   if (!token) return
@@ -33,22 +35,30 @@ onMounted(async () => {
   const headers = { authorization: `Bearer ${token}` }
 
   try {
-    // ✅ 주문 상태
-    const orderRes = await axios.get('/api/dashboard/order-status', { headers })
-    const order = orderRes.data
-    paid.value = order.paid
-    preparing.value = order.preparing
-    delivering.value = order.delivering
-    cancel.value = order.cancelled
-    returnCount.value = order.returnRequested
-    exchange.value = order.exchangeRequested
+    // ✅ 로그인한 회원 등급
+    const gradeRes = await axios.get('/api/login/me', { headers })
+    grade_id.value = gradeRes.data.grade_id
+    console.log("grade_id: ", gradeRes.data.grade_id)
 
-    // ✅ 상품 상태
-    const productRes = await axios.get('/api/products/dashboard/product-status', { headers })
-    const product = productRes.data
-    onSale.value = product.onSale
-    offSale.value = product.offSale
-    outOfStock.value = product.outOfStock
+    if(grade_id.value === 'HOST')
+    {
+      // ✅ 주문 상태
+      const orderRes = await axios.get('/api/dashboard/order-status', { headers })
+      const order = orderRes.data
+      paid.value = order.paid
+      preparing.value = order.preparing
+      delivering.value = order.delivering
+      cancel.value = order.cancelled
+      returnCount.value = order.returnRequested
+      exchange.value = order.exchangeRequested
+
+      // ✅ 상품 상태
+      const productRes = await axios.get('/api/products/dashboard/product-status', { headers })
+      const product = productRes.data
+      onSale.value = product.onSale
+      offSale.value = product.offSale
+      outOfStock.value = product.outOfStock
+    }
   } catch (e) {
     console.error('대시보드 데이터 조회 실패:', e)
   }
@@ -57,6 +67,7 @@ onMounted(async () => {
 
 <template>
   <div class="dashboard-grid">
+    <template v-if="grade_id==='HOST'">
     <div class="card-group" style="grid-area: cards">
       <SummaryCardOrder :paid="paid" :preparing="preparing" :delivering="delivering" />
       <SummaryCardProduct :onSale="onSale" :offSale="offSale" :outOfStock="outOfStock" />
@@ -79,6 +90,10 @@ onMounted(async () => {
       <RecentInquiry />
       <StockWarningCard />
     </div>
+    </template>
+    <template v-else>
+      로딩중...
+    </template>
   </div>
 </template>
 

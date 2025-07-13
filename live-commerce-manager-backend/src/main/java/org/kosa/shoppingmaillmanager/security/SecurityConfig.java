@@ -35,7 +35,7 @@ public class SecurityConfig {
             .logout(logout -> logout.disable()) // 기본 로그인 비활성화
             .authorizeHttpRequests(auth -> auth
 
-                .requestMatchers("/api/broadcast/start", "/members/me", "/products", "/products/**", "/dashboard/**", "/video/upload").authenticated()
+                .requestMatchers("/api/broadcast/start", "/members/me", "/products", "/products/**", "/dashboard/**", "/video/upload", "/order/**", "/broadcast/**").authenticated()
 
                 .anyRequest().permitAll()
             )
