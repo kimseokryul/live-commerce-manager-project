@@ -1,0 +1,256 @@
+.order-detail-page {
+  font-family: 'Noto Sans KR', sans-serif;
+  width: 100%;
+  flex: 1;
+  padding: 0;
+  margin: 0;
+  min-height: 100%;
+  box-sizing: border-box;
+  font-size: 14px;
+}
+
+h3 {
+  font-size: 20px;
+  margin-bottom: 16px;
+}
+
+.product-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 24px;
+}
+
+.product-table th{
+  border: 1px solid #ddd;
+  padding: 12px;
+  text-align: center;
+  background-color: #eeeeee;
+  vertical-align: middle;
+}
+
+.product-table td {
+  border: 1px solid #ddd;
+  padding: 12px;
+  text-align: center;
+  background-color: #ffffff;
+  vertical-align: middle;
+}
+
+.product-img {
+  width: 60px;
+  height: 60px;
+  border-radius: 6px;
+  margin: 6px 0;
+}
+
+.badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  margin-bottom: 6px;
+}
+
+.green {
+  background: #e6f4ea;
+  color: #137333;
+}
+
+.yellow {
+  background: #fffdea;
+  color: #d4a600;
+}
+
+.red {
+  background: #f8d7da;
+  color: red;
+}
+
+.orange {
+  background: #ffe5b4;
+  color: #f97316;
+}
+
+.blue {
+  background: #e8f0fe;
+  color: #2563eb;
+}
+
+.summary-wrapper {
+  display: flex;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+/* .benefit-box,
+.invoice-box {
+  flex: 1;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 16px;
+  background: #fafafa;
+}
+
+.benefit-box ul,
+.invoice-box ul {
+  list-style: none;
+  padding: 0;
+}
+
+.benefit-box li,
+.invoice-box li {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 0;
+  border-bottom: 1px dotted #ccc;
+} */
+
+
+.invoice-box {
+  flex: 1;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 16px;
+  background: #fafafa;
+}
+
+
+.invoice-box ul {
+  list-style: none;
+  padding: 0;
+}
+
+
+.invoice-box li {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 0;
+  border-bottom: 1px dotted #ccc;
+}
+
+
+/* .payment-box {
+  flex: 1;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 32px; 
+  background: #fafafa;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.payment-box button {
+  margin: 8px 0; 
+} */
+
+
+.order-date {
+  text-align: right;
+  font-size: 13px;
+  margin-top: 8px;
+  color: #666;
+}
+
+.payment-box {
+  margin-bottom: 24px;
+  padding: 16px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  background: #fff;
+} 
+
+.button-group {
+  margin-top: 8px;
+}
+
+.red-btn {
+  background: #ef4444;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  margin-right: 10px;
+  cursor: pointer;
+}
+
+.border-btn {
+  background: white;
+  color: #111;
+  padding: 10px 20px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.warning {
+  margin-top: 12px;
+  color: #e11d48;
+  font-size: 13px;
+}
+
+.bottom-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 40px;
+}
+
+.info-section {
+  margin-bottom: 32px;
+}
+
+.info-section h4 {
+  font-size: 16px;
+  margin-bottom: 10px;
+}
+
+.info-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  border: 1px solid #e0e0e0;
+}
+
+.info-table th,
+.info-table td {
+  border: 1px solid #e0e0e0;
+  padding: 10px 12px;
+  text-align: left;
+  vertical-align: top;
+}
+
+.info-table th {
+  background: #f9f9f9;
+  width: 140px;
+}
+
+.info-table input[type="text"],
+.info-table textarea {
+  width: 100%;
+  padding: 6px 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.info-table textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.black-btn {
+  background: #111;
+  color: #fff;
+  padding: 6px 12px;
+  margin-left: 8px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+}

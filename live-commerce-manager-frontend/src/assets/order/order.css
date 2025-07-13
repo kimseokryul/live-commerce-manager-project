@@ -1,0 +1,423 @@
+.rounded-order-page {
+  font-family: 'Noto Sans KR', sans-serif;
+  width: 100%;
+  flex: 1;
+  padding: 0;
+  margin: 0;
+  min-height: 100%;
+  box-sizing: border-box;
+}
+
+.page-title h2 {
+  font-size: 40px;
+  margin-bottom: 16px;
+}
+
+.rounded-search-bar {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.rounded-search-bar input{
+  width: 500px;
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+
+.rounded-search-bar select{
+  width: 150px;
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.rounded-search-bar
+.search-btn,
+.detail-btn {
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.search-btn,
+.detail-btn {
+  background-color: #fff;
+  cursor: pointer;
+}
+
+.rounded-control {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  margin-bottom: 16px;
+}
+
+.left-buttons{
+  display: flex;
+  gap: 8px;
+}
+
+.left-buttons button{
+  padding: 8px 14px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background: #fff;
+  font-size: 14px;
+  cursor: pointer;
+}
+.right-selects{
+  display: flex;
+  gap: 8px;
+}
+
+.right-selects select {
+  display: flex;
+  gap: 8px;
+  width: 130px;
+  padding: 8px 14px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background: #fff;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+/* .rounded-control select {
+  width: 100px;
+  padding: 8px 14px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background: #fff;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.rounded-control button {
+  padding: 8px 14px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background: #fff;
+  font-size: 14px;
+  cursor: pointer;
+} */
+
+.rounded-table-wrapper {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+
+.rounded-order-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.rounded-order-table th{
+  padding: 14px;
+  /* border: 0.1px solid #eeeeee; */
+  text-align: center;
+  background-color: #dddddd;
+  /* border-bottom: 1px solid #eee; */
+}
+
+.rounded-order-table td {
+  padding: 14px;
+  border: 0.01px solid #eeeeee;
+  text-align: center;
+  /* border-bottom: 1px solid #eee; */
+}
+
+.order-num {
+  font-weight: bold;
+  color: #1a73e8;
+}
+
+.order-user {
+  font-size: 12px;
+  color: #888;
+}
+
+.product {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 6px 0;
+}
+
+.product img {
+  width: 50px;
+  height: 50px;
+  border-radius: 8px;
+}
+
+.product-name {
+  font-weight: bold;
+}
+
+.product-device {
+  font-size: 12px;
+  background: #e3f2fd;
+  color: #2196f3;
+  padding: 2px 8px;
+  border-radius: 8px;
+  display: inline-block;
+  margin-top: 4px;
+}
+
+.status {
+  font-size: 12px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  margin: 4px auto;
+  display: inline-block;
+}
+
+.status-green {
+  background: #e6f4ea;
+  color: #137333;
+}
+
+.status-blue {
+  background: #e8f0fe;
+  color: #1967d2;
+}
+
+.status-red { 
+  background: #f8d7da;  /* 연한 빨강 */
+  color: #721c24;       /* 진한 빨강 */
+}
+
+.status-orange {
+  background: #ffe5b4;  /* 살구색 */
+  color: #a05a00;       /* 어두운 주황 */
+}
+
+.status-yellow {
+  background: #fff3cd;  /* 연노랑 */
+  color: #856404;       /* 진한 노랑 */
+}
+
+.status-purple {
+  background: #e0d4f7;  /* 연보라 */
+  color: #5e3ea1;       /* 진보라 */
+}
+
+.status-pink {
+  background: #ffbdde;  /* 연분홍 */
+  color: #ff0080;       /* 진분홍 */
+}
+
+.status-brown {
+  background: #ffd69f;  /* 연갈색 */
+  color: #944f00;       /* 진갈색 */
+}
+
+.price {
+  color: red;
+  font-weight: bold;
+  margin-top: 4px;
+}
+
+/* .action-buttons button, 
+.action-button-link{
+  display: block;
+  margin: 6px auto;
+  padding: 6px 10px;
+  border: 1px solid #ccc;
+  background: white;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.action-buttons button:disabled {
+  background: #f0f0f0;
+  color: #aaa;
+  cursor: not-allowed;
+} */
+
+.action-buttons button,
+.action-button-link {
+  display: block;
+  margin: 6px auto;
+  padding: 6px 10px;
+  border: 1px solid #ccc;
+  background: white;
+  border-radius: 6px;
+  cursor: pointer;
+  text-align: center;
+  text-decoration: none;
+  color: inherit;
+  font-size: 14px;
+  width: 80px; /* ✅ 버튼 크기 통일 포인트 */
+  box-sizing: border-box;
+}
+
+.rounded-footer {
+  margin-top: 24px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.blue-btn {
+  padding: 10px 20px;
+  background-color: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.blue-btn:hover {
+  background-color: #1d4ed8;
+}
+
+.pagination-wrapper {
+  flex: 1 1 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-width: 0;
+  width: 100%;
+}
+
+.pagination {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  justify-content: center;
+  overflow-x: auto;
+  white-space: nowrap;
+  width: 100%;
+  scrollbar-width: thin;
+}
+.btn-main {
+  background: #2563eb;
+  color: #fff;
+  border: none;
+  border-radius: 7px;
+  font-size: 1.13rem;
+  font-weight: 700;
+  padding: 0.54rem 1.6rem;
+  cursor: pointer;
+  transition: background 0.2s;
+  height: 48px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 2px;
+}
+.btn-main.active,
+.pagination .btn-main.active {
+  background: #1746a2;
+  color: #fff;
+}
+.btn-main:disabled {
+  background: #e5e7eb;
+  color: #b3b9c9;
+  cursor: not-allowed;
+}
+.btn-main:hover {
+  background: #1746a2;
+}
+
+
+/* 아래는 검색 상세보기 CSS*/
+.detail-toggle {
+  font-weight: bold;
+  color: #2563eb;
+  border-color: #2563eb;
+}
+
+.detail-box {
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  padding: 24px;
+  margin-top: 16px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+
+.detail-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 8px;
+  font-size: 14px;
+}
+
+.detail-table th {
+  text-align: left;
+  padding: 12px;
+  background: #f5f6fa;
+  border: 1px solid #e0e0e0;
+  width: 120px;
+  vertical-align: top;
+}
+
+.detail-table td {
+  padding: 12px;
+  border: 1px solid #e0e0e0;
+  vertical-align: middle;
+}
+
+.detail-table input[type='date'] {
+  width: 200px;
+  padding: 8px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+.detail-table input[type="text"] {
+  padding: 6px 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+.detail-table
+.quick-range {
+  flex-wrap: nowrap; 
+}
+
+.detail-table label {
+  margin-right: 10px;
+}
+
+.detail-table button {
+  margin-left: 6px;
+  padding: 4px 10px;
+  font-size: 13px;
+  background: #f2f4f7;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.bottom-buttons {
+  text-align: center;
+  margin-top: 16px;
+}
+
+.search-btn {
+  padding: 10px 24px;
+  background-color: #2563eb;
+  color: white;
+  font-weight: bold;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
