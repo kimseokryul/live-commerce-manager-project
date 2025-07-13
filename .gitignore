@@ -1,0 +1,13 @@
+# frontend
+/live-commerce-manager-frontend/node_modules/
+/live-commerce-manager-frontend/dist/
+
+# backend
+/live-commerce-manager-backend/build/
+/live-commerce-manager-backend/.gradle/
+/live-commerce-manager-backend/logs/
+
+# 공통
+*.log
+.env
+.DS_Store
