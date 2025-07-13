@@ -78,8 +78,8 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 	
 	// httpClient 의존성 추가
-	implementation 'org.apache.httpcomponents.client5:httpclient5:5.2.3'
-	implementation 'org.apache.httpcomponents.client5:httpmime5:5.2.3'
+	// implementation 'org.apache.httpcomponents.client5:httpclient5:5.2.3'
+	// implementation 'org.apache.httpcomponents.client5:httpmime5:5.2.3'
 }
 
 tasks.named('test') {

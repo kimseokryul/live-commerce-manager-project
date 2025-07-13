@@ -425,77 +425,77 @@ public class BroadCastController {
     } 
     
     // 방송자의 녹화 파일(mp4 등)을 업로드받아 서버에 저장하고, 재생 가능한 URL을 DB에 저장하는 API
-    @PostMapping("/video/upload")
-    public ResponseEntity<?> upload(@RequestParam MultipartFile file,      // 클라이언트에서 업로드한 파일
-                                    @RequestParam int broadcast_id) {     			    // 어떤 방송의 영상인지 식별할 ID
-
-        // Spring 서버 내에 녹화 파일을 저장할 디렉토리 경로 (이 경로는 서버 로컬 디스크 기준)
-        String saveDir = "C:/videos/";
-
-        // 저장할 파일명: broadcast ID와 원본 파일명을 조합하여 고유하게 생성 (ex. broadcast_5_myvideo.mp4)
-        String filename = "broadcast_" + broadcast_id + "_" + file.getOriginalFilename();
-
-        try {
-        	
-        	// 저장 폴더가 없으면 생성
-            File dir = new File(saveDir);
-            if (!dir.exists()) {
-                boolean created = dir.mkdirs(); // 폴더 생성 (상위 경로까지 포함)
-                if (!created) {
-                    return ResponseEntity.status(500).body("❌ 저장 디렉토리 생성 실패");
-                }
-            }
-        	
-            // 파일 저장: 업로드된 파일을 지정된 경로에 실제로 저장
-            // 저장 위치: Spring Boot가 실행 중인 PC의 로컬 디스크 (예: C:/upload/videos/...)
-            file.transferTo(new File(saveDir + filename));
-
-            // 현재 Spring 서버의 IP 주소를 자동으로 추출 (ex. 192.168.0.101)
-            String serverIp = broadCastService.getLocalIp(); // 아래에 정의된 getLocalIp() 메서드 참고
-
-            // 사용자 브라우저에서 접근 가능한 영상 URL 생성
-            // ex. http://192.168.0.101:8080/video/broadcast_5_myvideo.mp4
-            String videoUrl = "http://" + serverIp + ":8080/video/" + filename;
-
-            // DB 업데이트: 해당 방송 ID에 대해 생성된 videoUrl을 저장
-            // → 이후 Vue에서 이 URL을 불러와서 <video>로 재생할 수 있음
-            broadCastService.updateVideoUrl(broadcast_id, videoUrl);
-
-            // 응답: 생성된 영상 URL을 클라이언트에 JSON으로 반환
-            return ResponseEntity.ok(Map.of("video_url", videoUrl));
-        } catch (IOException e) {
-            // 파일 저장 중 에러 발생 시 500 에러 반환
-            return ResponseEntity.status(500).body("업로드 실패");
-        }
-    }
-    
-    	// 현재 서버의 IPv4 주소를 자동으로 추출하는 메서드
- 		// Spring Boot가 실행 중인 PC의 실제 네트워크 IP (ex. 192.168.0.101)를 반환함
- 		private String getLocalIp() {
- 			try {
- 				// 현재 시스템에 존재하는 모든 네트워크 인터페이스(유선랜, 와이파이, 가상 어댑터 등)를 순회
- 			   for (NetworkInterface ni : Collections.list(NetworkInterface.getNetworkInterfaces())) {
- 			             
- 			   // 해당 인터페이스에 연결된 모든 IP 주소를 순회 (IPv4, IPv6 포함)
- 			   for (InetAddress addr : Collections.list(ni.getInetAddresses())) {
- 			
- 			       // 조건 1: 루프백 주소는 제외 (예: 127.0.0.1 → 자기 자신용 주소는 사용 X)
- 			       // 조건 2: IPv4 주소만 추출 (IPv6 주소는 제외)
- 			       if (!addr.isLoopbackAddress() && addr instanceof Inet4Address) {
- 			
- 			                     // 조건을 만족하는 첫 번째 IPv4 주소를 반환 (예: 192.168.0.101)
- 			                     return addr.getHostAddress();
- 			                 }
- 			             }
- 			        }
- 			} catch (Exception e) {
- 			         // 예외 발생 시 로그 출력 (예: 인터페이스 조회 실패 등)
- 			         e.printStackTrace();
- 			}
- 			
- 			// 조건에 맞는 IP를 찾지 못하거나 예외 발생 시 fallback 값으로 "localhost" 반환
- 			return "localhost";
- 		}
+//    @PostMapping("/video/upload")
+//    public ResponseEntity<?> upload(@RequestParam MultipartFile file,      // 클라이언트에서 업로드한 파일
+//                                    @RequestParam int broadcast_id) {     			    // 어떤 방송의 영상인지 식별할 ID
+//
+//        // Spring 서버 내에 녹화 파일을 저장할 디렉토리 경로 (이 경로는 서버 로컬 디스크 기준)
+//        String saveDir = "C:/videos/";
+//
+//        // 저장할 파일명: broadcast ID와 원본 파일명을 조합하여 고유하게 생성 (ex. broadcast_5_myvideo.mp4)
+//        String filename = "broadcast_" + broadcast_id + "_" + file.getOriginalFilename();
+//
+//        try {
+//        	
+//        	// 저장 폴더가 없으면 생성
+//            File dir = new File(saveDir);
+//            if (!dir.exists()) {
+//                boolean created = dir.mkdirs(); // 폴더 생성 (상위 경로까지 포함)
+//                if (!created) {
+//                    return ResponseEntity.status(500).body("❌ 저장 디렉토리 생성 실패");
+//                }
+//            }
+//        	
+//            // 파일 저장: 업로드된 파일을 지정된 경로에 실제로 저장
+//            // 저장 위치: Spring Boot가 실행 중인 PC의 로컬 디스크 (예: C:/upload/videos/...)
+//            file.transferTo(new File(saveDir + filename));
+//
+//            // 현재 Spring 서버의 IP 주소를 자동으로 추출 (ex. 192.168.0.101)
+//            String serverIp = broadCastService.getLocalIp(); // 아래에 정의된 getLocalIp() 메서드 참고
+//
+//            // 사용자 브라우저에서 접근 가능한 영상 URL 생성
+//            // ex. http://192.168.0.101:8080/video/broadcast_5_myvideo.mp4
+//            String videoUrl = "http://" + serverIp + ":8080/video/" + filename;
+//
+//            // DB 업데이트: 해당 방송 ID에 대해 생성된 videoUrl을 저장
+//            // → 이후 Vue에서 이 URL을 불러와서 <video>로 재생할 수 있음
+//            broadCastService.updateVideoUrl(broadcast_id, videoUrl);
+//
+//            // 응답: 생성된 영상 URL을 클라이언트에 JSON으로 반환
+//            return ResponseEntity.ok(Map.of("video_url", videoUrl));
+//        } catch (IOException e) {
+//            // 파일 저장 중 에러 발생 시 500 에러 반환
+//            return ResponseEntity.status(500).body("업로드 실패");
+//        }
+//    }
+//    
+//    	// 현재 서버의 IPv4 주소를 자동으로 추출하는 메서드
+// 		// Spring Boot가 실행 중인 PC의 실제 네트워크 IP (ex. 192.168.0.101)를 반환함
+// 		private String getLocalIp() {
+// 			try {
+// 				// 현재 시스템에 존재하는 모든 네트워크 인터페이스(유선랜, 와이파이, 가상 어댑터 등)를 순회
+// 			   for (NetworkInterface ni : Collections.list(NetworkInterface.getNetworkInterfaces())) {
+// 			             
+// 			   // 해당 인터페이스에 연결된 모든 IP 주소를 순회 (IPv4, IPv6 포함)
+// 			   for (InetAddress addr : Collections.list(ni.getInetAddresses())) {
+// 			
+// 			       // 조건 1: 루프백 주소는 제외 (예: 127.0.0.1 → 자기 자신용 주소는 사용 X)
+// 			       // 조건 2: IPv4 주소만 추출 (IPv6 주소는 제외)
+// 			       if (!addr.isLoopbackAddress() && addr instanceof Inet4Address) {
+// 			
+// 			                     // 조건을 만족하는 첫 번째 IPv4 주소를 반환 (예: 192.168.0.101)
+// 			                     return addr.getHostAddress();
+// 			                 }
+// 			             }
+// 			        }
+// 			} catch (Exception e) {
+// 			         // 예외 발생 시 로그 출력 (예: 인터페이스 조회 실패 등)
+// 			         e.printStackTrace();
+// 			}
+// 			
+// 			// 조건에 맞는 IP를 찾지 못하거나 예외 발생 시 fallback 값으로 "localhost" 반환
+// 			return "localhost";
+// 		}
     
     
 	 

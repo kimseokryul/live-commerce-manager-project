@@ -29,6 +29,8 @@ import HostList from '../components/admin/HostList.vue'
 import WidthdrawnUserList from '../components/admin/WidthdrawnUserList.vue'
 
 import SellerSales from '../components/seller/Sales/SellerSales.vue'
+import AdminDashboard from '../components/seller/AdminDashboard.vue'
+import AdminSellerSales from '../components/admin/sales/AdminSellerSales.vue'
 
 const Login = () => import('@/components/login/login.vue')
 const Register = () => import('@/components/host/register.vue')
@@ -38,6 +40,7 @@ const ChangePassword = () => import('@/components/login/ChangePassword.vue')
 
 const routes = [
   { path: '/', name: 'Dashboard', component: SellerDashboard, meta: { requiresAuth: true }},
+  { path: '/admin', name: 'AdminDashboard', component: AdminDashboard, meta: { requiresAuth: true }},
   { path: '/product', name: 'ProductList', component: ProductList },
   { path: '/product/register', name: 'ProductRegister', component: ProductRegister },
   { path: '/product/:productId/edit', name: 'ProductEdit', component: ProductEdit, props: true },
@@ -69,6 +72,7 @@ const routes = [
   { path: '/broadcast/detail/:broadcast_id', name: 'BroadCastDetail', component: BroadCastDetail, props: true},
 
   { path: '/sellerSales', name: 'sellerSales', component: SellerSales, props: true},
+  { path: '/admin/sellerSales', name: 'AdminSellerSales', component: AdminSellerSales, props: true},
   { path: '/admin/user-list', name: 'UserList', component: UserList, props: true},
   { path: '/admin/user-list/locked', name: 'LockedUserList', component: LockedUserList, props: true},
   { path: '/admin/user-list/widthdrawn', name: 'WidthdrawnUserList', component: WidthdrawnUserList, props: true},

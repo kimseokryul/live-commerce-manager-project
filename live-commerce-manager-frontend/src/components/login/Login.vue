@@ -69,7 +69,13 @@ const handleLogin = async () => {
       localStorage.removeItem('rememberMe')
     }
 
-    router.push('/')
+    const gradeRes = await axios.get('/api/login/me', { authorization: `Bearer ${token}` })
+    if (gradeRes.data.grade_id==='ADMIN'){
+      router.push('/admin')
+    }
+    else{
+      router.push('/')
+    }
   } catch (error) {
     alert(error.response?.data?.error || '로그인 실패')
     console.error(error)
