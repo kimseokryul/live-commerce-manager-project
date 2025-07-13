@@ -28,7 +28,7 @@ import LockedUserList from '../components/admin/LockedUserList.vue'
 import HostList from '../components/admin/HostList.vue'
 import WidthdrawnUserList from '../components/admin/WidthdrawnUserList.vue'
 
-import SellerSales from '../components/seller/Sales/SellerSales.vue'
+import SellerSales from '../components/seller/sales/SellerSales.vue'
 
 const Login = () => import('@/components/login/login.vue')
 const Register = () => import('@/components/host/register.vue')
