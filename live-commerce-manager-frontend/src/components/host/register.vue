@@ -75,13 +75,13 @@
           </select>
         </div>
 
-        <div class="form-item">
+        <!-- <div class="form-item">
           <label>프로필 이미지 URL</label>
           <div class="input-inline">
             <input v-model="form.profile_img" type="text" />
             <button type="button">첨부하기</button>
           </div>
-        </div>
+        </div> -->
 
         <div class="form-item">
           <label>사업자등록번호</label>

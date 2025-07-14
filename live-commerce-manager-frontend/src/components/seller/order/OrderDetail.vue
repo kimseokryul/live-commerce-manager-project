@@ -125,8 +125,8 @@
           <tr>
             <th>배송지 주소</th>
             <td colspan="3">
-              <input type="text" v-model="getOrderDetail.order_zipcode" style="width: 100px" />
-              <button class="black-btn">주소찾기</button>
+              <input type="text" v-model="getOrderDetail.order_zipcode" style="width: 100px" readonly/>
+              <button class="black-btn" @click="searchAddress">주소찾기</button>
               <input type="text" v-model="getOrderDetail.order_address_detail" style="width: 80%" />
               <!-- <input type="text" value="2" style="width: 80%" />
               <input type="text" value="광주 서구 치평동 1132-34" style="width: 80%" /> -->
@@ -180,6 +180,7 @@ const getOrderDetail = reactive({
   user_name: '',
   phone: '',
   email: '',
+  order_status: '',
   recipient_name: '',
   recipient_phone: '',
   order_zipcode: '',
@@ -239,6 +240,7 @@ const getOrders = async () => {
     getOrderDetail.user_name = data.user_name
     getOrderDetail.phone = data.phone
     getOrderDetail.email = data.email
+    getOrderDetail.order_status = data.order_status
     getOrderDetail.recipient_name = data.recipient_name
     getOrderDetail.recipient_phone = data.recipient_phone
     getOrderDetail.order_zipcode = data.order_zipcode
@@ -289,7 +291,29 @@ const cancelOrder = async (order_id) => {
   }
 }
 
+const loadDaumPostcodeScript = () => {
+  return new Promise((resolve, reject) => {
+    if (window.daum && window.daum.Postcode) {
+      resolve()
+      return
+    }
+    const script = document.createElement('script')
+    script.src = '//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js'
+    script.onload = resolve
+    script.onerror = reject
+    document.head.appendChild(script)
+  })
+}
 
+const searchAddress = async () => {
+  await loadDaumPostcodeScript()
+  new window.daum.Postcode({
+    oncomplete: function (data) {
+      getOrderDetail.order_zipcode = data.zonecode
+      getOrderDetail.order_address_detail = data.roadAddress || data.jibunAddress
+    }
+  }).open()
+}
 
 onMounted(() => {
   getOrderDetail.order_id = route.query.order_id
