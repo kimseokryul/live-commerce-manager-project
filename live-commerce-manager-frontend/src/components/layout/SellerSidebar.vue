@@ -3,12 +3,14 @@
     <div class="sidebar-logo">
       <template v-if= "LoginUser.grade_id === 'ADMIN'">
         <router-link to="/admin" class="logo-link" style="text-decoration: none; color: inherit;">
-          <span style="font-size:2.5rem;font-weight:bold;">LOGO</span>
+          <!-- <span style="font-size:2.5rem;font-weight:bold;">LOGO</span> -->
+           <img src="/src/assets/TriMarketAdmin-white.png" alt="TriMarket 로고" class="logo-img" />
         </router-link>
       </template>
       <template v-else>
         <router-link to="/" class="logo-link" style="text-decoration: none; color: inherit;">
-          <span style="font-size:2.5rem;font-weight:bold;">LOGO</span>
+          <!-- <span style="font-size:2.5rem;font-weight:bold;">LOGO</span> -->
+           <img src="/src/assets/TriMarketAdmin-white.png" alt="TriMarket 로고" class="logo-img" />
         </router-link>
       </template>
     </div>
@@ -250,5 +252,12 @@ onMounted(() => {
   .sidebar-link, .sidebar-link-btn { font-size: 1.2rem; padding-left: 1rem; }
   .menu-icon { min-width: 26px; margin-right: 0.7rem; }
   .submenu { margin-left: 2rem; }
+}
+
+.logo-img {
+  width: 240px;
+  height: auto;
+  margin-bottom: 1.5rem;
+  object-fit: contain;
 }
 </style>

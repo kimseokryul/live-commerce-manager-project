@@ -1,27 +1,21 @@
 package org.kosa.shoppingmaillmanager.security;
 
 import java.io.IOException;
-import java.util.Base64;
-import java.util.Date;
+import java.util.List;
 
-import javax.crypto.SecretKey;
-
-import io.jsonwebtoken.JwtException;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.security.Keys;
-
-import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+
+import io.jsonwebtoken.JwtException;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * JwtFilter 클래스는 JWT 생성, 검증, 인증 처리 기능을 통합한 필터 클래스입니다.
@@ -60,10 +54,13 @@ this.jwtUtil = jwtUtil;
                 if (jwtUtil.validateToken(token)) {
                     // 토큰에서 사용자 ID 추출
                     String userId = jwtUtil.validateTokenAndGetUserId(token);
+                    
+                    // 로그인한 사용자에게 최소한의 권한 (ROLE_USER)를 부여
+                    List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_USER"));
 
                     // 인증 객체 생성 (권한은 없음 → null)
                     UsernamePasswordAuthenticationToken authentication =
-                            new UsernamePasswordAuthenticationToken(userId, null, null);
+                            new UsernamePasswordAuthenticationToken(userId, null, authorities);
 
                     // 인증 객체에 요청 정보 추가 (IP, 세션 등)
                     authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));

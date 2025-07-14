@@ -155,9 +155,25 @@ public class BroadCastController {
     // 방송 정보 불러오기
     @GetMapping("/{broadcast_id}")
     public ResponseEntity<?> getBroadcastDetail(@PathVariable("broadcast_id") int broadcast_id) throws Exception {
-    	// 방송 정보 불러오기
-    	BroadCast b = broadCastService.getBroadcastDetails(broadcast_id);
     	
+    	// 인증 객체 확인
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null || !auth.isAuthenticated()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("🔒 인증 정보 없음");
+        }
+
+        String userId = (String) auth.getPrincipal();
+        System.out.println("✅ 로그인된 사용자: " + userId);
+
+        // 방송 정보 불러오기
+        BroadCast b = broadCastService.getBroadcastDetails(broadcast_id);
+        System.out.println("📡 방송 주인 ID: " + b.getBroadcaster_id());
+
+        // 방송 주인 확인 (null-safe)
+        if (b.getBroadcaster_id() == null || !b.getBroadcaster_id().toString().equals(userId)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Access Denied: You are not the owner of this broadcast.");
+        }
+
         // stream_key는 등록 시 이미 생성되어 있으므로 여기선 복호화만 하면 됨
         String streamKey = AESUtil.decrypt(b.getStream_key());
         
@@ -169,9 +185,11 @@ public class BroadCastController {
         
         Map<String, Object> result = new HashMap<>();
         result.put("broadcast", b);
-        result.put("stream_key", streamKey);
-        result.put("rtmp_url", rtmpUrl);
-        result.put("stream_url", hls_url);        
+        if(b.getBroadcaster_id().equals(userId)) {
+        	result.put("stream_key", streamKey);
+        	result.put("rtmp_url", rtmpUrl);
+        	result.put("stream_url", hls_url);        
+        }
         
         return ResponseEntity.ok(result);
     }
@@ -420,6 +438,21 @@ public class BroadCastController {
     // 방송 상태 변경
     @PutMapping("/status")
     public ResponseEntity<?> updateStatus(@RequestBody BroadCast broadCast) {
+    	// 1. 인증된 사용자 정보 꺼냄
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null || !auth.isAuthenticated()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인 필요");
+        }
+
+        String userId = (String) auth.getPrincipal();  // JWT 안의 user_id
+        System.out.println("✅ 현재 로그인한 userId = " + userId);
+
+        // 2. 방송 소유자 확인
+        BroadCast target = broadCastService.findById(broadCast.getBroadcast_id());
+        if (target == null || !target.getBroadcaster_id().equals(userId)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("접근 권한 없음");
+        }
+    	
         broadCastService.updateStatus(broadCast);
         return ResponseEntity.ok().body(Map.of("result", "success"));
     } 
