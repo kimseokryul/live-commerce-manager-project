@@ -13,7 +13,6 @@ import org.kosa.shoppingmaillmanager.host.product.dto.ProductStatusDto;
 import org.kosa.shoppingmaillmanager.host.product.dto.ProductUpdateDto;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -25,10 +24,13 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+@Tag(name = "상품 관리 API", description = "상품 등록, 수정, 조회 등의 기능을 제공")
 @RestController
 @RequiredArgsConstructor
 @Slf4j
@@ -38,6 +40,7 @@ public class ProductRestController {
     private final ProductService productService;
 
     // 상품 리스트 조회
+    @Operation(summary = "상품 목록 조회", description = "판매자가 등록한 상품 목록을 조회합니다.")
     @GetMapping
     public ResponseEntity<ProductListResponse> getProductList(
             HttpServletRequest request,
@@ -64,6 +67,7 @@ public class ProductRestController {
     }
 
     // 진열 여부 변경 (userId 포함)
+    @Operation(summary = "진열 여부 변경", description = "상품의 진열 상태를 변경합니다.")
     @PostMapping("/display-yn")
     public ResponseEntity<?> updateDisplayYn(
             @RequestBody Map<String, Object> body,
@@ -82,6 +86,7 @@ public class ProductRestController {
     }
 
     // 상품 상세 조회
+    @Operation(summary = "상품 상세 조회", description = "상품 ID로 상세 정보를 조회합니다.")
     @GetMapping("/{productId}")
     public ResponseEntity<ProductSimpleDTO> getProductDetail(
         @PathVariable Integer productId,
@@ -93,6 +98,7 @@ public class ProductRestController {
     }
 
     // 상품 필드 개별 수정
+    @Operation(summary = "상품 개별 수정", description = "상품 상세 정보화면에서 개별 수정합니다.")
     @PatchMapping("/{productId}")
     public ResponseEntity<?> updateProductField(
         @PathVariable Integer productId,
@@ -103,7 +109,7 @@ public class ProductRestController {
         productService.updateProductField(userId, productId, updates);
         return ResponseEntity.ok().build();
     }
-    
+    @Operation(summary = "상품 등록", description = "판매할 상품을 등록합니다.")
     @PostMapping
     public ResponseEntity<?> registerProduct(
         @RequestPart("product") ProductRequestDto productDto,
@@ -126,7 +132,7 @@ public class ProductRestController {
             return ResponseEntity.internalServerError().body("상품 등록 중 오류가 발생했습니다.");
         }
     }
-    
+    @Operation(summary = "상품 수정", description = "등록된 상품을 수정합니다.")
     @PostMapping("/{productId}/edit")
     public ResponseEntity<?> updateProduct(
             @PathVariable("productId") Integer productId,
@@ -149,7 +155,7 @@ public class ProductRestController {
             return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
         }
     }
-    
+    @Operation(summary = "품절 임박 상품 조회", description = "등록한 상품 중 품절에 임박한 상품을 조회합니다", tags = {"매출 현황 및 대시보드 API"})
     @GetMapping("/dashboard/sold-out")
     public ResponseEntity<LowStockProductSummaryDto> getLowStockProducts(HttpServletRequest request) {
         String userId = (String) request.getAttribute("userId");
@@ -158,7 +164,7 @@ public class ProductRestController {
         LowStockProductSummaryDto result = productService.getLowStockProducts(userId);
         return ResponseEntity.ok(result);
     }
-    
+    @Operation(summary = "인기 상품 조회", description = "등록한 상품 중 인기 상품을 조회합니다.", tags = {"매출 현황 및 대시보드 API"})
     @GetMapping("/dashboard/popular")
     public ResponseEntity<List<PopularProductDto>> getPopularProducts(HttpServletRequest request) {
         String userId = (String) request.getAttribute("userId");
@@ -167,7 +173,7 @@ public class ProductRestController {
         List<PopularProductDto> result = productService.getPopularProducts(userId);
         return ResponseEntity.ok(result);
     }
-    
+    @Operation(summary = "상품 상태 조회", description = "등록한 상품의 상품 상태를 조회합니다." ,tags = {"매출 현황 및 대시보드 API"})
     @GetMapping("/dashboard/product-status")
     public ResponseEntity<ProductStatusDto> getProductStatus(HttpServletRequest request) {
         String userId = (String) request.getAttribute("userId");

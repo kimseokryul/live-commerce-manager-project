@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import io.swagger.v3.oas.annotations.Hidden;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,6 +20,7 @@ public class MemberController {
 	
 	private final MemberService memberService;
 	
+	@Hidden
 	@GetMapping("/me/{broadcastId}")
 	public ResponseEntity<MemberDto> getMyInfoWithBroadcast(
 	        @PathVariable String broadcastId,

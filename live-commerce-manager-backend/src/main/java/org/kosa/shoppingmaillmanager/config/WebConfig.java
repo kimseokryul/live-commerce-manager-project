@@ -19,5 +19,6 @@ public class WebConfig implements WebMvcConfigurer {
 		// 다시보기 영상(mp4 등) 전용 경로 처리
 		    registry.addResourceHandler("/video/upload/**")
 		            .addResourceLocations("file:///C:/videos/");
+		    // ggg
 	  }
 }

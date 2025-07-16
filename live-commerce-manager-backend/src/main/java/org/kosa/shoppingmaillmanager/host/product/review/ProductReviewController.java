@@ -14,9 +14,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 
+@Tag(name = "상품 관리 API", description = "상품 후기 조회 및 관리 기능 제공")
 @RestController
 @RequestMapping
 @RequiredArgsConstructor
@@ -25,6 +28,7 @@ public class ProductReviewController {
     private final ProductReviewService productReviewService;
 
     // 1. 후기 상세 조회 (판매자는 공개 여부와 관계없이 조회 가능)
+    @Operation(summary = "후기 상세 조회", description = "상품 ID와 후기 ID로 상세 정보를 조회합니다. (공개/비공개 무관)")
     @GetMapping("/products/{productId}/reviews/{reviewId}")
     public ResponseEntity<ProductReviewDetailDTO> getReviewDetail(
             @PathVariable int productId,
@@ -38,6 +42,7 @@ public class ProductReviewController {
     }
 
     // 2. 공개 여부 변경 (displayYn)
+    @Operation(summary = "후기 공개 여부 변경", description = "해당 후기를 공개/비공개로 설정합니다.")
     @PutMapping("/products/{productId}/reviews/{reviewId}/display-yn")
     public ResponseEntity<Void> updateDisplayYn(
             @PathVariable int productId,
@@ -51,6 +56,7 @@ public class ProductReviewController {
     }
 
     // 3. 후기 목록 조회 (판매자는 공개/비공개 모두 조회 가능)
+    @Operation(summary = "상품별 후기 목록 조회", description = "특정 상품의 후기 목록을 조회합니다. (공개/비공개 포함)")
     @GetMapping("/products/{productId}/reviews")
     public ResponseEntity<List<ProductReviewDTO>> getReviewList(
             @PathVariable int productId,
@@ -62,6 +68,7 @@ public class ProductReviewController {
     }
     
     // 4. 판매자 후기 전체 목록 조회 (검색 포함, 최신순 정렬)
+    @Operation(summary = "판매자 전체 후기 목록 조회", description = "판매자가 등록한 전체 상품의 후기 목록을 검색하고 조회합니다.")
     @GetMapping("/seller/reviews")
     public ResponseEntity<List<ProductReviewDTO>> getReviewsByHost(
             @RequestParam(required = false) String keyword,

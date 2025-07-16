@@ -153,7 +153,9 @@ const getBroadCasts = async () => {
     return
   }
   try{
-    const response = await axios.get(`/api/broadcast/${broadcast.broadcast_id}`)
+    const response = await axios.get(`/api/broadcast/${broadcast.broadcast_id}`, {
+      headers: { Authorization: `Bearer ${token.value}`}
+    })
     
     console.log("✅ response.data:", response.data)
     
@@ -338,7 +340,10 @@ const exitBroadcast = async () => {
 
 const updateBroadcastStatus = async (payload) => {
   try {
-    await axios.put('/api/broadcast/status', payload)
+    await axios.put('/api/broadcast/status', payload, {
+      headers: {
+        Authorization: `Bearer ${token.value}`
+      }})
     alert('방송 상태 업데이트 완료!')
   } catch (err) {
     alert('업데이트 실패: ' + err.message)

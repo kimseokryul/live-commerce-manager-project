@@ -1,14 +1,17 @@
 <template>
   <div class="login-container">
     <div class="login-box">
+      
       <div class="login-header">
-        <div class="avatar">
+        <!-- ✅ 로고 추가 -->
+        <img src="/src/assets/TriMarketAdmin-black.png" alt="TriMarket 로고" class="logo-img" />
+        <!-- <div class="avatar">
           <svg xmlns="http://www.w3.org/2000/svg" class="avatar-icon" viewBox="0 0 16 16" fill="currentColor">
             <path d="M8 9a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/>
             <path fill-rule="evenodd" d="M14 13s-1-1.5-6-1.5S2 13 2 13v1h12v-1z"/>
           </svg>
-        </div>
-        <h2>LOGIN</h2>
+        </div> -->
+        <!-- <h2>LOGIN</h2> -->
       </div>
 
       <form @submit.prevent="handleLogin">
@@ -34,6 +37,7 @@
           <router-link to="/host/register">호스트 가입</router-link>
         </p>
       </form>
+      
     </div>
   </div>
 </template>
@@ -69,7 +73,13 @@ const handleLogin = async () => {
       localStorage.removeItem('rememberMe')
     }
 
-    router.push('/')
+    const gradeRes = await axios.get('/api/login/me', { authorization: `Bearer ${token}` })
+    if (gradeRes.data.grade_id==='ADMIN'){
+      router.push('/admin')
+    }
+    else{
+      router.push('/')
+    }
   } catch (error) {
     alert(error.response?.data?.error || '로그인 실패')
     console.error(error)
@@ -215,6 +225,13 @@ form button:hover {
   color: #3b5998;
   text-decoration: none;
   font-weight: 500;
+}
+
+.logo-img {
+  width: 300px;
+  height: auto;
+  margin-bottom: 1.5rem;
+  object-fit: contain;
 }
 </style>
 <!-- 안녕 -->

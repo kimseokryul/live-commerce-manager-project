@@ -1,9 +1,18 @@
 <template>
   <aside class="seller-sidebar">
     <div class="sidebar-logo">
-      <router-link to="/" class="logo-link" style="text-decoration: none; color: inherit;">
-        <span style="font-size:2.5rem;font-weight:bold;">LOGO</span>
-      </router-link>
+      <template v-if= "LoginUser.grade_id === 'ADMIN'">
+        <router-link to="/admin" class="logo-link" style="text-decoration: none; color: inherit;">
+          <!-- <span style="font-size:2.5rem;font-weight:bold;">LOGO</span> -->
+           <img src="/src/assets/TriMarketAdmin-white.png" alt="TriMarket 로고" class="logo-img" />
+        </router-link>
+      </template>
+      <template v-else>
+        <router-link to="/" class="logo-link" style="text-decoration: none; color: inherit;">
+          <!-- <span style="font-size:2.5rem;font-weight:bold;">LOGO</span> -->
+           <img src="/src/assets/TriMarketAdmin-white.png" alt="TriMarket 로고" class="logo-img" />
+        </router-link>
+      </template>
     </div>
 
     <nav>
@@ -23,8 +32,8 @@
               <li><router-link :to="{ path: '/admin/user-list/host', query: { filterType: 'host' } }" class="submenu-link">호스트 관리</router-link></li>
             </ul>
           </li>
-          <li><router-link to="/admin/sales" class="sidebar-link"><span class="menu-icon">📊</span>매출 현황</router-link></li>
-          <li><router-link to="/admin/board" class="sidebar-link"><span class="menu-icon">📋</span>게시판 관리</router-link></li>
+          <!-- <li><router-link to="/admin/sellerSales" class="sidebar-link"><span class="menu-icon">📊</span>매출 현황</router-link></li>
+          <li><router-link to="/admin/board" class="sidebar-link"><span class="menu-icon">📋</span>게시판 관리</router-link></li> -->
         </template>
 
         <!-- 🟦 호스트 전용 메뉴 -->
@@ -243,5 +252,12 @@ onMounted(() => {
   .sidebar-link, .sidebar-link-btn { font-size: 1.2rem; padding-left: 1rem; }
   .menu-icon { min-width: 26px; margin-right: 0.7rem; }
   .submenu { margin-left: 2rem; }
+}
+
+.logo-img {
+  width: 240px;
+  height: auto;
+  margin-bottom: 1.5rem;
+  object-fit: contain;
 }
 </style>

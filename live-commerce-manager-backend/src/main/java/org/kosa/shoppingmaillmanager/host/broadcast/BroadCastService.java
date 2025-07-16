@@ -12,15 +12,15 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
-import org.apache.hc.client5.http.classic.methods.HttpPost;
-import org.apache.hc.client5.http.entity.mime.MultipartEntityBuilder;
-import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
-import org.apache.hc.client5.http.impl.classic.HttpClients;
-import org.apache.hc.core5.http.ClassicHttpResponse;
-import org.apache.hc.core5.http.ContentType;
-import org.apache.hc.core5.http.HttpEntity;
-import org.apache.hc.core5.http.io.HttpClientResponseHandler;
-import org.apache.hc.core5.http.io.entity.EntityUtils;
+//import org.apache.hc.client5.http.classic.methods.HttpPost;
+//import org.apache.hc.client5.http.entity.mime.MultipartEntityBuilder;
+//import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+//import org.apache.hc.client5.http.impl.classic.HttpClients;
+//import org.apache.hc.core5.http.ClassicHttpResponse;
+//import org.apache.hc.core5.http.ContentType;
+//import org.apache.hc.core5.http.HttpEntity;
+//import org.apache.hc.core5.http.io.HttpClientResponseHandler;
+//import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.kosa.shoppingmaillmanager.page.PageResponseVO;
 import org.kosa.shoppingmaillmanager.security.AESUtil;
 import org.springframework.stereotype.Service;
@@ -317,7 +317,7 @@ public class BroadCastService {
 	            	           
 
 	            	            try {
-	            	                uploadToSpringServer(outputPath, broadcast_id);
+//	            	                uploadToSpringServer(outputPath, broadcast_id);
 	            	               log.info("📁 녹화 파일 경로: {}", outputPath);
 	            	            } catch (Exception e) {
 	            	                log.error("❌ 업로드 실패", e);
@@ -346,94 +346,94 @@ public class BroadCastService {
 	 * @throws java.io.IOException 
 	 * @throws InterruptedException 
 	 */
-	private void uploadToSpringServer(String filePath, int broadcastId) throws IOException, java.io.IOException, InterruptedException {
-	    // 1. 업로드할 영상 파일 객체 생성
-	    File file = new File(filePath);
-
-	    // 2. 파일이 실제로 존재하는지 체크 (최대 5초까지 기다림)
-	    int waitMs = 0;
-	    while (!file.exists() && waitMs < 5000) {
-	        Thread.sleep(200);
-	        waitMs += 200;
-	    }
-	    if (!file.exists()) {
-	        log.warn("❌ 업로드 실패: 파일이 존재하지 않습니다 → {}", filePath);
-	        return;
-	    }
-
-	    // 3. 업로드를 요청할 Spring 서버의 API 주소
-	    // TODO: 실제 Spring 서버의 IP 또는 도메인 주소로 수정해야 함
-	    String serverIp = getLocalIp();
-	    String uploadUrl = "http://" + serverIp + ":8080/video/upload";
-
-	    // 4. HTTP 클라이언트 생성 (자동으로 close 처리)
-	    try (CloseableHttpClient client = HttpClients.createDefault()) {
-	        // 5. POST 방식의 요청 생성
-	        HttpPost post = new HttpPost(uploadUrl);
-
-	        // 6. multipart/form-data 본문 구성
-	        //    - file: 실제 영상 파일
-	        //    - broadcast_id: 방송 식별용 텍스트 값
-	        HttpEntity entity = MultipartEntityBuilder.create()
-	                .addBinaryBody("file", file, ContentType.DEFAULT_BINARY, file.getName())
-	                .addTextBody("broadcast_id", String.valueOf(broadcastId), ContentType.TEXT_PLAIN)
-	                .build();
-
-	        // 7. 구성한 엔티티를 요청에 설정
-	        post.setEntity(entity);
-
-	        // 8. 서버 응답 처리 핸들러 정의
-	        HttpClientResponseHandler<Void> responseHandler = (ClassicHttpResponse response) -> {
-	            int status = response.getCode(); // 응답 상태 코드 (예: 200, 400, 500)
-	            String responseBody = EntityUtils.toString(response.getEntity()); // 응답 본문
-
-	            // 9. 업로드 성공 여부 로깅
-	            if (status == 200) {
-	                log.info("✅ 업로드 성공! 응답: {}", responseBody);
-	            } else {
-	                log.warn("❌ 업로드 실패 (HTTP {}): {}", status, responseBody);
-	            }
-
-	            return null; // 반환값 없음
-	        };
-
-	        // 10. 실제 요청 전송 + 응답 처리
-	        client.execute(post, responseHandler);
-
-	    } catch (IOException e) {
-	        // 11. 네트워크 또는 I/O 예외 발생 시 로그 출력 + 예외 던지기
-	        log.error("❌ 파일 업로드 중 예외 발생", e);
-	        throw e;
-	    }
-	}
-	
-	
-	// 현재 서버의 IPv4 주소를 자동으로 추출하는 메서드
-	 		// Spring Boot가 실행 중인 PC의 실제 네트워크 IP (ex. 192.168.0.101)를 반환함
-	 		public String getLocalIp() {
-	 			try {
-	 				// 현재 시스템에 존재하는 모든 네트워크 인터페이스(유선랜, 와이파이, 가상 어댑터 등)를 순회
-	 			   for (NetworkInterface ni : Collections.list(NetworkInterface.getNetworkInterfaces())) {
-	 			             
-	 			   // 해당 인터페이스에 연결된 모든 IP 주소를 순회 (IPv4, IPv6 포함)
-	 			   for (InetAddress addr : Collections.list(ni.getInetAddresses())) {
-	 			
-	 			       // 조건 1: 루프백 주소는 제외 (예: 127.0.0.1 → 자기 자신용 주소는 사용 X)
-	 			       // 조건 2: IPv4 주소만 추출 (IPv6 주소는 제외)
-	 			       if (!addr.isLoopbackAddress() && addr instanceof Inet4Address) {
-	 			
-	 			                     // 조건을 만족하는 첫 번째 IPv4 주소를 반환 (예: 192.168.0.101)
-	 			                     return addr.getHostAddress();
-	 			                 }
-	 			             }
-	 			        }
-	 			} catch (Exception e) {
-	 			         // 예외 발생 시 로그 출력 (예: 인터페이스 조회 실패 등)
-	 			         e.printStackTrace();
-	 			}
-	 			
-	 			// 조건에 맞는 IP를 찾지 못하거나 예외 발생 시 fallback 값으로 "localhost" 반환
-	 			return "localhost";
-	 		}
+//	private void uploadToSpringServer(String filePath, int broadcastId) throws IOException, java.io.IOException, InterruptedException {
+//	    // 1. 업로드할 영상 파일 객체 생성
+//	    File file = new File(filePath);
+//
+//	    // 2. 파일이 실제로 존재하는지 체크 (최대 5초까지 기다림)
+//	    int waitMs = 0;
+//	    while (!file.exists() && waitMs < 5000) {
+//	        Thread.sleep(200);
+//	        waitMs += 200;
+//	    }
+//	    if (!file.exists()) {
+//	        log.warn("❌ 업로드 실패: 파일이 존재하지 않습니다 → {}", filePath);
+//	        return;
+//	    }
+//
+//	    // 3. 업로드를 요청할 Spring 서버의 API 주소
+//	    // TODO: 실제 Spring 서버의 IP 또는 도메인 주소로 수정해야 함
+//	    String serverIp = getLocalIp();
+//	    String uploadUrl = "http://" + serverIp + ":8080/video/upload";
+//
+//	    // 4. HTTP 클라이언트 생성 (자동으로 close 처리)
+//	    try (CloseableHttpClient client = HttpClients.createDefault()) {
+//	        // 5. POST 방식의 요청 생성
+//	        HttpPost post = new HttpPost(uploadUrl);
+//
+//	        // 6. multipart/form-data 본문 구성
+//	        //    - file: 실제 영상 파일
+//	        //    - broadcast_id: 방송 식별용 텍스트 값
+//	        HttpEntity entity = MultipartEntityBuilder.create()
+//	                .addBinaryBody("file", file, ContentType.DEFAULT_BINARY, file.getName())
+//	                .addTextBody("broadcast_id", String.valueOf(broadcastId), ContentType.TEXT_PLAIN)
+//	                .build();
+//
+//	        // 7. 구성한 엔티티를 요청에 설정
+//	        post.setEntity(entity);
+//
+//	        // 8. 서버 응답 처리 핸들러 정의
+//	        HttpClientResponseHandler<Void> responseHandler = (ClassicHttpResponse response) -> {
+//	            int status = response.getCode(); // 응답 상태 코드 (예: 200, 400, 500)
+//	            String responseBody = EntityUtils.toString(response.getEntity()); // 응답 본문
+//
+//	            // 9. 업로드 성공 여부 로깅
+//	            if (status == 200) {
+//	                log.info("✅ 업로드 성공! 응답: {}", responseBody);
+//	            } else {
+//	                log.warn("❌ 업로드 실패 (HTTP {}): {}", status, responseBody);
+//	            }
+//
+//	            return null; // 반환값 없음
+//	        };
+//
+//	        // 10. 실제 요청 전송 + 응답 처리
+//	        client.execute(post, responseHandler);
+//
+//	    } catch (IOException e) {
+//	        // 11. 네트워크 또는 I/O 예외 발생 시 로그 출력 + 예외 던지기
+//	        log.error("❌ 파일 업로드 중 예외 발생", e);
+//	        throw e;
+//	    }
+//	}
+//	
+//	
+//	// 현재 서버의 IPv4 주소를 자동으로 추출하는 메서드
+//	 		// Spring Boot가 실행 중인 PC의 실제 네트워크 IP (ex. 192.168.0.101)를 반환함
+//	 		public String getLocalIp() {
+//	 			try {
+//	 				// 현재 시스템에 존재하는 모든 네트워크 인터페이스(유선랜, 와이파이, 가상 어댑터 등)를 순회
+//	 			   for (NetworkInterface ni : Collections.list(NetworkInterface.getNetworkInterfaces())) {
+//	 			             
+//	 			   // 해당 인터페이스에 연결된 모든 IP 주소를 순회 (IPv4, IPv6 포함)
+//	 			   for (InetAddress addr : Collections.list(ni.getInetAddresses())) {
+//	 			
+//	 			       // 조건 1: 루프백 주소는 제외 (예: 127.0.0.1 → 자기 자신용 주소는 사용 X)
+//	 			       // 조건 2: IPv4 주소만 추출 (IPv6 주소는 제외)
+//	 			       if (!addr.isLoopbackAddress() && addr instanceof Inet4Address) {
+//	 			
+//	 			                     // 조건을 만족하는 첫 번째 IPv4 주소를 반환 (예: 192.168.0.101)
+//	 			                     return addr.getHostAddress();
+//	 			                 }
+//	 			             }
+//	 			        }
+//	 			} catch (Exception e) {
+//	 			         // 예외 발생 시 로그 출력 (예: 인터페이스 조회 실패 등)
+//	 			         e.printStackTrace();
+//	 			}
+//	 			
+//	 			// 조건에 맞는 IP를 찾지 못하거나 예외 발생 시 fallback 값으로 "localhost" 반환
+//	 			return "localhost";
+//	 		}
 
 }
