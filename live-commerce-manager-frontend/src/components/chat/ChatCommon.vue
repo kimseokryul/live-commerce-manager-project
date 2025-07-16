@@ -180,9 +180,9 @@ const selectedMsg = ref(null);
 
 let chatSubscription = null;
 
-const socket = new SockJS('http://192.168.4.134:8080/ws-chat');
+const socket = new SockJS('http://localhost:8080/ws-chat');
 const stompClient = new Client({
-  webSocketFactory: () => new SockJS('http://192.168.4.134:8080/ws-chat'),
+  webSocketFactory: () => new SockJS('http://localhost:8080/ws-chat'),
   reconnectDelay: 5000,
   onConnect: () => {
     // 📌 채팅 메시지 구독
