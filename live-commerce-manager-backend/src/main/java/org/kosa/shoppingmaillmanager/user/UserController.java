@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.kosa.shoppingmaillmanager.page.PageResponseVO;
 import org.kosa.shoppingmaillmanager.security.JwtUtil;
@@ -160,73 +161,6 @@ public class UserController {
 	    ));
 	}
 	
-	
-	// 로그아웃
-//	@PostMapping("/logout")
-//	public ResponseEntity<?> logout(Authentication authentication, HttpServletResponse response) {
-//		// 현재 로그인한 사용자의 ID 추출 (AccessToken이 이미 인증됨)
-//		String userId = authentication.getName();
-//
-//		// 서버에 저장된 해당 사용자의 RefreshToken 삭제
-//	    refreshTokenService.delete(userId);
-//
-//	    // 클라이언트 브라우저에 있는 refreshToken 쿠키를 삭제하기 위한 설정
-//	    ResponseCookie deleteCookie = ResponseCookie.from("refreshToken", "") // 쿠키 이름 동일하게 설정
-//	        .httpOnly(true) // HttpOnly로 설정 → JS 접근 불가 (기존과 동일하게 설정)
-//	        .secure(true) // HTTPS 환경에서만 동작 (기존과 동일하게 설정)
-//	        .path("/") // 경로 범위 설정
-//	        .maxAge(0) // ⏱ maxAge=0 → 즉시 만료 → 삭제 효과
-//	        .build();
-//
-//	    //  위에서 만든 쿠키 삭제 명령을 응답 헤더에 설정
-//	    response.setHeader("Set-Cookie", deleteCookie.toString());
-//
-//	    // 로그아웃 성공 메시지를 응답으로 반환
-//	    return ResponseEntity.ok().body("로그아웃 완료");
-//	}
-	
-	// 로그아웃
-//	@PostMapping("/logout")
-//	public ResponseEntity<?> logout(HttpServletRequest request, HttpServletResponse response) {
-//
-//	    // 1. 요청 헤더에서 Authorization 값을 가져옴 (Bearer {AccessToken} 형식)
-//	    String authHeader = request.getHeader("Authorization");
-//
-//	    // 2. Authorization 헤더가 없거나 "Bearer " 형식이 아니면 401 반환
-//	    if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-//	        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Authorization 헤더 없음");
-//	    }
-//
-//	    // 3. "Bearer " 접두사를 제거하고 실제 AccessToken만 추출
-//	    String token = authHeader.substring(7);
-//
-//	    // 4. 토큰을 검증하고, 유효하면 해당 토큰의 사용자 ID 추출
-//	    String userId;
-//	    try {
-//	        userId = jwtUtil.validateTokenAndGetUserId(token); // 👉 유효하지 않으면 예외 발생
-//	    } catch (Exception e) {
-//	        // 5. 토큰이 만료되었거나 변조된 경우 → 401 Unauthorized 응답
-//	        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("유효하지 않은 토큰");
-//	    }
-//
-//	    // 6. 서버에 저장된 해당 사용자의 refreshToken 제거
-//	    refreshTokenService.delete(userId);
-//
-//	    // 7. 클라이언트 측에 저장된 refreshToken 쿠키를 삭제하기 위한 설정
-//	    ResponseCookie deleteCookie = ResponseCookie.from("refreshToken", "") // 쿠키 이름은 동일하게 설정해야 삭제됨
-//	        .httpOnly(true)        // JS에서 접근 못 하게 막음 (보안 강화)
-//	        .secure(true)          // HTTPS에서만 전송 (로컬에서는 false로 설정 가능)
-//	        .path("/")             // 모든 경로에 대해 삭제 적용
-//	        .maxAge(0)             // 만료 시간 0초 → 즉시 삭제
-//	        .build();
-//
-//	    // 8. 응답 헤더에 Set-Cookie를 추가하여 클라이언트의 쿠키 삭제 유도
-//	    response.setHeader("Set-Cookie", deleteCookie.toString());
-//
-//	    // 9. 최종적으로 로그아웃 성공 메시지를 응답으로 반환
-//	    return ResponseEntity.ok("로그아웃 완료");
-//	}
-	
 	@PostMapping("/logout")
 	public ResponseEntity<String> logout() {
 	    return ResponseEntity.ok("로그아웃 되었습니다");
@@ -237,9 +171,12 @@ public class UserController {
 	public ResponseEntity<?> findId(@RequestParam String name,
 		    @RequestParam String email) {
 
-	    User user = userService.findByNameAndEmail(name, email);
+	    List<User> user = userService.findByNameAndEmail(name, email);
 	    if (user != null) {
-	        return ResponseEntity.ok(Map.of("user_Id", user.getUser_id()));
+	    	List<String> userIds = user.stream()
+	                .map(User::getUser_id)
+	                .collect(Collectors.toList());
+	        return ResponseEntity.ok(Map.of("userIds", userIds));
 	    } else {
 	        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("일치하는 정보 없음");
 	    }

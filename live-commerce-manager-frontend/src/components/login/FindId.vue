@@ -37,7 +37,7 @@ const findId = async () => {
         email: email.value
       }
     })
-    foundId.value = res.data.user_Id
+    foundId.value = res.data.userIds
   } catch (e) {
     alert('일치하는 정보가 없습니다.')
   }

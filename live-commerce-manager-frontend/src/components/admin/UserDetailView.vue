@@ -216,7 +216,7 @@
                 <span class="slider-label off">ON</span>
                 <span class="slider-label on">OFF</span>
                 </span>
-                <p>현재 값: {{ User.approved_yn }}</p>
+                <!-- <p>현재 값: {{ User.approved_yn }}</p> -->
             </label>
         </div>
     </div>
@@ -429,8 +429,21 @@ const forceWithdraw = async () => {
       params: { secession_yn: 'Y' }
     })
     alert(res.data || '탈퇴 처리 완료되었습니다.')
-     // ✅ 사용자 정보 다시 불러오기
+     // 사용자 정보 다시 불러오기
     // await getUserDetail()
+    
+     // 마이페이지일 경우, 로그아웃 후 로그인 페이지로 이동
+      if (isMyPage) {
+      // 토큰 삭제 (localStorage, sessionStorage 모두)
+      localStorage.removeItem('jwt')
+      sessionStorage.removeItem('jwt')
+
+      // 로그인 페이지로 이동
+      router.push('/login')
+    } else {
+      // ✅ 관리자일 경우, 사용자 정보 새로고침
+      // await getUserDetail()
+    }
   } catch (e) {
     console.error('❌ 탈퇴 실패:', e)
     alert('탈퇴 처리 중 오류가 발생했습니다.')

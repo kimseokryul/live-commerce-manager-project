@@ -109,7 +109,7 @@
             </thead>
             <tbody>
               <tr v-for="(item, index) in broadcast.productList" :key="index">
-                <td><img :src="item.product.mainImage" alt="상품" width="50" /></td>
+                <td><img :src="getFullImageUrl(item.product.mainImage)" alt="상품" width="50" /></td>
                 <td>{{ item.product.name }}</td>
                 <td>{{ item.product.price.toLocaleString() }}원</td>
                 <td><button @click="removeProduct(index)">❌</button></td>
@@ -323,6 +323,11 @@ const copyStreamKey = async () => {
     alert('복사 실패')
   }
 }
+
+function getFullImageUrl(path) {
+  return `http://localhost:8080${path}`;  // 백엔드 주소에 맞게 변경!
+}
+
 
 onMounted(() => {
   searchProducts()

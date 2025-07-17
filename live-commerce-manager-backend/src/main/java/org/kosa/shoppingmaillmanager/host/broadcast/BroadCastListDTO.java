@@ -19,6 +19,7 @@ public class BroadCastListDTO {
 	private String broadcaster_id;
 	private String created_at;
 	private Integer current_viewers;
+	private Integer total_viewers;
 	private Long category_id;
 	private String category_name;
 }

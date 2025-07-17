@@ -150,7 +150,7 @@ public class BroadCastService {
 		map.put("title", dto.getTitle());
 		map.put("broadcaster_id", dto.getBroadcaster_id());
 		map.put("created_at", dto.getCreated_at());
-		map.put("current_viewers", dto.getCurrent_viewers());
+		map.put("total_viewers", dto.getTotal_viewers());
 		map.put("category_id", dto.getCategory_id());
 
 		List<BroadCastListDTO> list = broadCastDAO.findBroadcastList(map);
