@@ -2,22 +2,31 @@ version: '3.8'
 
 services:
   backend:
-    build:
-      context: ./live-commerce-manager-backend
+    image: kimseokryul/backend-app
     container_name: backend-app
     ports:
       - "8081:8080"
     volumes:
+      - /opt/data/hls:/opt/data/hls
       - /opt/data/upload:/opt/data/upload
       - /opt/data/videos:/opt/data/videos
+    environment:
+      - JWT_SECRET=${JWT_SECRET}
     restart: always
+    depends_on:
+      - redis
 
   frontend:
-    build:
-      context: ./live-commerce-manager-frontend
+    image: kimseokryul/frontend-app
     container_name: frontend-app
     ports:
       - "8082:80"
     restart: always
     depends_on:
       - backend
+
+  redis:
+    image: redis:latest
+    container_name: redis
+    ports:
+      - "6379:6379"

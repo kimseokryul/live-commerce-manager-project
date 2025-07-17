@@ -6,6 +6,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
 
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -80,6 +81,15 @@ public class ChatSessionManager {
     public void broadcastCountToTopic(Long broadcastId) {
         int count = getParticipantCount(broadcastId);
         messagingTemplate.convertAndSend("/topic/participants/" + broadcastId, count);
+    }
+    
+    @PostConstruct
+    public void testRedisConnection() {
+        try {
+            log.info("🔌 Redis ping: {}", redisTemplate.getConnectionFactory().getConnection().ping());
+        } catch (Exception e) {
+            log.error("❌ Redis 연결 실패: {}", e.getMessage());
+        }
     }
     
 //    public void banUserFromChat(Long broadcastId, String userIdOrUuid, int duration)
