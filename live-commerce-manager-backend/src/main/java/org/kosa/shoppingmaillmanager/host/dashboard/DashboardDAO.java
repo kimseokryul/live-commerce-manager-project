@@ -7,6 +7,8 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.kosa.shoppingmaillmanager.host.product.dto.MonthlySalesSummaryDto;
 import org.kosa.shoppingmaillmanager.host.product.dto.OrderStatusCountDto;
+import org.kosa.shoppingmaillmanager.host.product.dto.SalesCategoryDTO;
+import org.kosa.shoppingmaillmanager.host.product.dto.SalesHostDTO;
 import org.kosa.shoppingmaillmanager.host.product.dto.SalesOrderItemDto;
 import org.kosa.shoppingmaillmanager.host.product.dto.SalesSummaryDto;
 import org.kosa.shoppingmaillmanager.host.product.dto.TopProductDto;
@@ -40,6 +42,16 @@ public interface DashboardDAO {
         @Param("productKeyword") String productKeyword,
         @Param("paymentMethodKeyword") String paymentMethodKeyword
     );
+
+    // 최근 30일 전체 일별 매출 요약
+	List<SalesSummaryDto> getWholeDailySalesSummary();
+
+	// 최근 30일 전체 월별 매출 요약
+	List<SalesSummaryDto> getWholeMonthlySalesSummary();
+
+	List<SalesCategoryDTO> getDashboardCategorySales();
+
+	List<SalesHostDTO> getDashboardHostSales();
 }
 
 
