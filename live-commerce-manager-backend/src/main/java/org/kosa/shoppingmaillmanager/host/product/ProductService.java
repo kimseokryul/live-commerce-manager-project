@@ -231,4 +231,8 @@ public class ProductService {
 	    // 2. 상태별 상품 수 조회
 	    return productDAO.countProductStatus(hostId);
 	}
+
+	public List<PopularProductDto> getWholePopularProducts() {
+		return productDAO.findWholePopularProducts();
+	}
 }

@@ -1,14 +1,19 @@
 package org.kosa.shoppingmaillmanager.host.dashboard;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.kosa.shoppingmaillmanager.host.order.OrderDAO;
 import org.kosa.shoppingmaillmanager.host.product.HostDAO;
 import org.kosa.shoppingmaillmanager.host.product.dto.MonthlySalesSummaryDto;
 import org.kosa.shoppingmaillmanager.host.product.dto.OrderStatusCountDto;
+import org.kosa.shoppingmaillmanager.host.product.dto.SalesCategoryDTO;
+import org.kosa.shoppingmaillmanager.host.product.dto.SalesHostDTO;
 import org.kosa.shoppingmaillmanager.host.product.dto.SalesOrderItemDto;
 import org.kosa.shoppingmaillmanager.host.product.dto.SalesSummaryDto;
 import org.kosa.shoppingmaillmanager.host.product.dto.TopProductDto;
+import org.kosa.shoppingmaillmanager.user.UserDAO;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
@@ -19,6 +24,8 @@ public class DashboardService {
 
 	private final DashboardDAO dashboardDAO;
 	private final HostDAO hostDAO;
+	private final UserDAO userDAO;
+	private final OrderDAO orderDAO;
 
 	public OrderStatusCountDto getOrderStatusCounts(String userId) {
 		String hostId = hostDAO.findHostIdByUserId(userId);
@@ -60,5 +67,34 @@ public class DashboardService {
 			String productKeyword, String paymentMethodKeyword) {
 		String hostId = hostDAO.findHostIdByUserId(userId);
 		return dashboardDAO.findSalesOrderItems(hostId, startDate, endDate, productKeyword, paymentMethodKeyword);
+	}
+
+	 public Map<String, Object> getDashboardStats() {
+	        Map<String, Object> stats = new HashMap<>();
+
+	        stats.put("todaySales", orderDAO.selectTodaySales());
+	        stats.put("totalMembers", userDAO.countTotalMembers());
+	        stats.put("newMembers", userDAO.countTodayNewMembers());
+	        stats.put("totalOrders", orderDAO.countTotalOrders());
+	        stats.put("processingOrders", orderDAO.countProcessingOrders());
+	        stats.put("totalHosts", userDAO.countTotalHosts());
+
+	        return stats;
+	 }
+
+	public List<SalesSummaryDto> getWholeDailySalesSummary() {
+		return dashboardDAO.getWholeDailySalesSummary();
+	}
+
+	public List<SalesSummaryDto> getWholeMonthlySalesSummary() {
+		return dashboardDAO.getWholeMonthlySalesSummary();
+	}
+
+	public List<SalesCategoryDTO> getDashboardCategorySales() {
+		return dashboardDAO.getDashboardCategorySales();
+	}
+
+	public List<SalesHostDTO> getDashboardHostSales() {
+		return dashboardDAO.getDashboardHostSales();
 	}
 }

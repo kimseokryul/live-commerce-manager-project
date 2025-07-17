@@ -39,8 +39,11 @@ h3 {
 .product-img {
   width: 60px;
   height: 60px;
-  border-radius: 6px;
-  margin: 6px 0;
+  object-fit: cover;   /* 비율 유지하며 자르기 */
+  border-radius: 8px;  /* 살짝 둥글게 */
+  border: 1px solid #eee; /* 테두리로 구분감 추가 */
+  margin-right: 8px;   /* 이미지와 텍스트 간격 */
+  vertical-align: middle;
 }
 
 .badge {

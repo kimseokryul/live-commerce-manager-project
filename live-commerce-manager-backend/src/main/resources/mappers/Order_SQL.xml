@@ -42,6 +42,7 @@
 	  <result property="discount_amount" column="discount_amount"/>
 	  <result property="original_total_price" column="original_total_price"/>
 	  <result property="final_payment_amount" column="final_payment_amount"/>
+	  <result property="total_quantity" column="total_quantity"/>
 	
 	  <!-- 주문 상품들 -->
 	  <collection property="orderItems" ofType="org.kosa.shoppingmaillmanager.host.order.OrderItemDTO"> 
@@ -84,16 +85,16 @@
 	    <if test="searchValue != null and searchValue != ''">
 	      <choose>
 	        <when test="searchColumn == null or searchColumn == ''">
-	          (
+	          AND (
 	            o.order_id LIKE CONCAT('%', #{searchValue}, '%')
 	            OR p.name LIKE CONCAT('%', #{searchValue}, '%')
 	          )
 	        </when>
 	        <when test="searchColumn eq 'order_id'">
-	          o.order_id LIKE CONCAT('%', #{searchValue}, '%')
+	          AND o.order_id LIKE CONCAT('%', #{searchValue}, '%')
 	        </when>
 	        <when test="searchColumn eq 'product_name'">
-	          p.name LIKE CONCAT('%', #{searchValue}, '%')
+	          AND p.name LIKE CONCAT('%', #{searchValue}, '%')
 	        </when>
 	      </choose>
 	    </if>
@@ -225,16 +226,16 @@
 	    <if test="searchValue != null and searchValue != ''">
 	      <choose>
 	        <when test="searchColumn == null or searchColumn == ''">
-	          (
+	          AND(
 	            o.order_id LIKE CONCAT('%', #{searchValue}, '%')
 	            OR p.name LIKE CONCAT('%', #{searchValue}, '%')
 	          )
 	        </when>
 	        <when test="searchColumn eq 'order_id'">
-	          o.order_id LIKE CONCAT('%', #{searchValue}, '%')
+	          AND o.order_id LIKE CONCAT('%', #{searchValue}, '%')
 	        </when>
 	        <when test="searchColumn eq 'product_name'">
-	          p.name LIKE CONCAT('%', #{searchValue}, '%')
+	          AND p.name LIKE CONCAT('%', #{searchValue}, '%')
 	        </when>
 	      </choose>
 	    </if>
@@ -329,6 +330,10 @@
 		  o.discount_amount,
 		  o.original_total_price,
 		  o.final_payment_amount,
+		  o.*,
+		    (SELECT SUM(quantity)
+		     FROM tb_order_item
+		     WHERE order_id = o.order_id) AS total_quantity,
 		  i.quantity,
 		  i.name AS item_name,
 		  i.image_url,
@@ -397,5 +402,19 @@
 	  JOIN tb_product p ON i.product_id = p.product_id
 	  WHERE o.user_id = #{user_id}
 	  ORDER BY o.order_date DESC
+	</select>
+	
+	<select id="countTotalOrders" resultType="int">
+	  SELECT COUNT(*) FROM tb_order
+	</select>
+	
+	<select id="countProcessingOrders" resultType="int">
+	  SELECT COUNT(*) FROM tb_order WHERE order_status != '배송완료'
+	</select>
+	
+	<select id="selectTodaySales" resultType="int">
+	  SELECT IFNULL(SUM(final_payment_amount), 0)
+	  FROM tb_order
+	  WHERE DATE(order_date) = CURRENT_DATE
 	</select>
 </mapper>

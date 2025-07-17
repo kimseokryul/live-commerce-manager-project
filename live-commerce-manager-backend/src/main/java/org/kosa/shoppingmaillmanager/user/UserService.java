@@ -103,7 +103,7 @@ public class UserService {
 	}
 
 
-	public User findByNameAndEmail(String name, String email) {
+	public List<User> findByNameAndEmail(String name, String email) {
 		return userDAO.findByNameAndEmail(name, email);
 	}
 

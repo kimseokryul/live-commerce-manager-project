@@ -176,5 +176,12 @@ public class ProductRestController {
         ProductStatusDto result = productService.getProductStatus(userId);
         return ResponseEntity.ok(result);
     }
+    
+    @GetMapping("/dashboard/admin/popular")
+    public ResponseEntity<List<PopularProductDto>> getWholePopularProducts(HttpServletRequest request) {
+
+        List<PopularProductDto> result = productService.getWholePopularProducts();
+        return ResponseEntity.ok(result);
+    }
 }
 
