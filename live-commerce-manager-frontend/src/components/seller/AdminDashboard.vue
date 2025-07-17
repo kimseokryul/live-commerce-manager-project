@@ -28,9 +28,9 @@ const exchange = ref(0)
 const grade_id = ref('')
 
 const kpi = ref({
-  todaySales: '₩0',
-  totalUsers: 0,
-  newUsers: 0,
+  todaySales: '0₩',
+  totalMembers: 0,
+  newMembers: 0,
   totalOrders: 0,
   processingOrders: 0,
   totalHosts: 0,
@@ -69,9 +69,12 @@ onMounted(async () => {
       outOfStock.value = product.outOfStock
 
     }
-    
-    
-    
+
+    else {
+      const dashboardRes = await axios.get('api/dashboard/admin', { headers })
+      kpi.value = dashboardRes.data
+    }
+ 
   } catch (e) {
     console.error('대시보드 데이터 조회 실패:', e)
   }
@@ -83,9 +86,9 @@ onMounted(async () => {
     <template v-if="grade_id==='ADMIN'">
       <!-- ✅ KPI 요약 카드 영역 -->
       <div class="kpi-cards">
-        <KpiCard icon="💰" title="오늘 매출" :value="kpi.todaySales" />
-        <KpiCard icon="👥" title="총 회원 수" :value="kpi.totalUsers" />
-        <KpiCard icon="🆕" title="신규 회원 수" :value="kpi.newUsers" />
+        <KpiCard icon="💰" title="오늘 매출" :value="kpi.todaySales + '₩'" />
+        <KpiCard icon="👥" title="총 회원 수" :value="kpi.totalMembers"/>
+        <KpiCard icon="🆕" title="신규 회원 수" :value="kpi.newMembers" />
         <KpiCard icon="📦" title="총 주문 수" :value="kpi.totalOrders" />
         <KpiCard icon="🚚" title="처리 중 주문" :value="kpi.processingOrders" />
         <KpiCard icon="🧑‍💼" title="총 호스트 수" :value="kpi.totalHosts" />

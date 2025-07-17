@@ -145,7 +145,7 @@
             </td>
             <td>
               <div class="product" v-for="(p, idx) in order.orderItems" :key="idx">
-                <img :src="p.item_image_url" />
+                <img :src="getFullImageUrl(p.item_image_url)" />
                 <div>
                   <div class="product-name">{{ p.item_name }}</div>
                   <div class="product-device">{{ p.quantity }}개</div>
@@ -374,6 +374,10 @@ const cancelMultiOrder = async () => {
     console.error('주문 취소 실패', error)
     alert('주문 취소에 실패했습니다.')
   }
+}
+
+function getFullImageUrl(path) {
+  return `http://localhost:8080${path}`;  // 백엔드 주소에 맞게 변경!
 }
 
 onMounted(() => {

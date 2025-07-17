@@ -27,6 +27,7 @@ public class OrderDetailDTO {
 	private int discount_amount; // 총 할인 금액
 	private int original_total_price; // 할인 전 총 금액
 	private int final_payment_amount; // 총 금액
+	private int total_quantity;  // 총 구매 갯수
 	
 	// tb_order_item 테이블
 	// 하나의 주문 번호에 여러 개의 주문 상품이 존재하기 때문에 List로 선언

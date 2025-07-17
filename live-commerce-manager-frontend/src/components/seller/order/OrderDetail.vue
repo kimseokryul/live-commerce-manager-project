@@ -22,7 +22,7 @@
               <div :class="getStatusClass(item.item_status)">{{ item.item_status }}</div>
             </td>
             <td>
-              <img :src="item.item_image_url" class="product-img" />
+              <img :src="getFullImageUrl(item.item_image_url)" class="product-img" />
               {{ item.item_name }}
             </td>
             <td>{{ item.item_total_price }}원</td>
@@ -38,7 +38,7 @@
       <div class="invoice-box">
         <h4>주문서 ({{ getOrderDetail.order_id }})</h4>
         <ul>
-          <li>상품개수 <span>{{ getOrderDetail.quantity }}개</span></li>
+          <li>상품개수 <span>{{ getOrderDetail.total_quantity }}개</span></li>
           <li>총 상품금액 <span class="blue">{{ getOrderDetail.total_price }}원</span></li>
           <li>총 배송비 <span class="green">+ {{ getOrderDetail.delivery_fee }}원</span></li>
           <li>할인금액 <span class="orange">- {{ getOrderDetail.discount_amount }}원</span></li>
@@ -192,6 +192,7 @@ const getOrderDetail = reactive({
   discount_amount: '',
   original_total_price: '',
   final_payment_amount: '',
+  total_quantity: '',
   orderItems: [{ 
     quantity: '',
     item_name: '', 
@@ -252,6 +253,7 @@ const getOrders = async () => {
     getOrderDetail.discount_amount = data.discount_amount
     getOrderDetail.original_total_price = data.original_total_price
     getOrderDetail.final_payment_amount = data.final_payment_amount
+    getOrderDetail.total_quantity = data.total_quantity
 
     // 주문 상품 목록 세팅
     items.value = data.orderItems
@@ -313,6 +315,10 @@ const searchAddress = async () => {
       getOrderDetail.order_address_detail = data.roadAddress || data.jibunAddress
     }
   }).open()
+}
+
+function getFullImageUrl(path) {
+  return `http://localhost:8080${path}`;  // 백엔드 주소에 맞게 변경!
 }
 
 onMounted(() => {

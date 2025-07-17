@@ -50,8 +50,8 @@ watch(chartValues, () => {
 // ✅ Axios로 매출 데이터 요청
 const fetchData = async () => {
   const endpoint = viewType.value === 'daily'
-    ? '/api/dashboard/sales/daily'
-    : '/api/dashboard/sales/monthly'
+    ? '/api/dashboard/admin/sales/daily'
+    : '/api/dashboard/admin/sales/monthly'
 
   const token = localStorage.getItem('jwt') || sessionStorage.getItem('jwt')
 

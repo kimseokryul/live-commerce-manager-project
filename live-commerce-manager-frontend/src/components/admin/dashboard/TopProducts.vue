@@ -28,7 +28,7 @@ onMounted(async () => {
   if (!token) return
 
   try {
-    const res = await axios.get('/api/products/dashboard/popular', {
+    const res = await axios.get('/api/products/dashboard/admin/popular', {
       headers: { Authorization: `Bearer ${token}` }
     })
 

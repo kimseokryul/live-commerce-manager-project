@@ -49,7 +49,7 @@ public class BroadCastController {
 	private final ViewerRedisService redisService;
 	
 	 // 실제 서버에 썸네일을 저장할 디렉터리 (로컬 경로)
-    private static final String UPLOAD_DIR = "C:/upload/";
+	private static final String UPLOAD_DIR = "/opt/data/upload/";
     
     // 방송 등록
     @PostMapping("/register")

@@ -313,4 +313,17 @@
 	    #{id}
 	  </foreach>
 	</update>
+	
+	<!-- UserMapper.xml -->
+	<select id="countTotalMembers" resultType="int">
+	  SELECT COUNT(*) FROM tb_member
+	</select>
+	
+	<select id="countTodayNewMembers" resultType="int">
+	  SELECT COUNT(*) FROM tb_member WHERE DATE(created_date) = CURRENT_DATE
+	</select>
+	
+	<select id="countTotalHosts" resultType="int">
+	  SELECT COUNT(*) FROM tb_host
+	</select>
 </mapper>

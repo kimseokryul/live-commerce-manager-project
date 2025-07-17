@@ -11,7 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class FileStorageService {
 
     // 실제 저장 경로 (운영에서는 외부 경로로 분리 권장)
-    private final String uploadDir = "C:/upload/product/";
+	private final String uploadDir = "/opt/data/upload/product/";
 
     public String store(MultipartFile file) throws IOException {
         String uploadDir = "C:/upload/product/main/"; // 실제 저장 경로

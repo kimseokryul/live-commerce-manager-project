@@ -8,5 +8,4 @@ public interface HostDAO {
 
     @Select("SELECT host_id FROM tb_host WHERE user_id = #{userId}")
     String findHostIdByUserId(String userId);
-
 }

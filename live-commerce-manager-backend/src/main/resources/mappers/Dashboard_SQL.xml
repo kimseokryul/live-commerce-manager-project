@@ -176,4 +176,72 @@
 
 		ORDER BY o.ORDER_DATE DESC
 	</select>
+	
+	<!-- 최근 30일 일별 매출 -->
+	<select id="getWholeDailySalesSummary"
+		resultType="org.kosa.shoppingmaillmanager.host.product.dto.SalesSummaryDto">
+		SELECT
+		DATE_FORMAT(oi.UPDATED_DATE, '%Y-%m-%d') AS label,
+		SUM(oi.TOTAL_PRICE) AS totalSales
+		FROM
+		tb_order_item oi
+		JOIN tb_product p
+		ON oi.PRODUCT_ID = p.PRODUCT_ID
+		WHERE oi.STATUS = '배송완료'
+		AND oi.UPDATED_DATE >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)
+		GROUP BY
+		DATE_FORMAT(oi.UPDATED_DATE, '%Y-%m-%d')
+		ORDER BY
+		label ASC
+	</select>
+
+	<!-- 최근 12개월 월별 매출 -->
+	<select id="getWholeMonthlySalesSummary"
+		resultType="org.kosa.shoppingmaillmanager.host.product.dto.SalesSummaryDto">
+		SELECT
+		DATE_FORMAT(oi.UPDATED_DATE, '%Y-%m') AS label,
+		SUM(oi.TOTAL_PRICE) AS totalSales
+		FROM
+		tb_order_item oi
+		JOIN tb_product p
+		ON oi.PRODUCT_ID = p.PRODUCT_ID
+		WHERE oi.STATUS = '배송완료'
+		AND oi.UPDATED_DATE >= DATE_SUB(CURDATE(), INTERVAL 12 MONTH)
+		GROUP BY
+		DATE_FORMAT(oi.UPDATED_DATE, '%Y-%m')
+		ORDER BY
+		label ASC
+	</select>
+	
+	<select id="getDashboardCategorySales"
+		resultType="org.kosa.shoppingmaillmanager.host.product.dto.SalesCategoryDTO">
+		SELECT
+		SUM(oi.total_price) AS total_price,
+		pc.name
+		FROM
+		tb_order_item oi 
+		JOIN tb_product p ON oi.product_id = p.product_id
+		JOIN tb_category c ON p.category_id = c.category_id
+		JOIN tb_category pc ON c.parent_category_id = pc.category_id
+		WHERE oi.status = '배송완료' 
+		GROUP BY pc.name
+    	ORDER BY SUM(oi.total_price) desc	
+    </select>
+    
+    <select id="getDashboardHostSales"
+    	resultType="org.kosa.shoppingmaillmanager.host.product.dto.SalesHostDTO">
+    	SELECT
+    	h.user_id,
+    	m.nickname,
+    	SUM(oi.total_price) as total_price
+    	FROM
+    	tb_order_item oi
+    	JOIN tb_product p ON oi.product_id = p.product_id
+    	JOIN tb_host h ON p.host_id = h.host_id
+    	JOIN tb_member m ON h.user_id = m.user_id
+    	WHERE oi.status = '배송완료'
+    	GROUP BY h.user_id
+    	ORDER BY SUM(oi.total_price) desc
+    	LIMIT 5
+    </select>
 </mapper>

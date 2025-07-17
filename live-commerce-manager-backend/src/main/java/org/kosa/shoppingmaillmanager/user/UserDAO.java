@@ -17,7 +17,7 @@ public interface UserDAO {
 	public Integer getFailCount(String userId);
 	public void lockUser(String userId);
 	public void resetFailCount(String userId);
-	public User findByNameAndEmail(@Param("name") String name, @Param("email") String email);
+	public List<User> findByNameAndEmail(@Param("name") String name, @Param("email") String email);
 	public User findByUserIdAndEmail(@Param("user_id") String user_id, @Param("email") String email);
 	public int updatePassword(@Param("user_id") String userId, @Param("password") String encodedPw);
 	public List<UserListDTO> getUserList(Map<String, Object> map);
@@ -30,4 +30,8 @@ public interface UserDAO {
             @Param("blacklisted") String blacklisted);
 	public int updateUnlockStatus(@Param("userIds") List<String> userIds, 
 			@Param("status") String status);
+	
+	public int countTotalMembers();
+	public int countTodayNewMembers();
+	public int countTotalHosts();
 }
