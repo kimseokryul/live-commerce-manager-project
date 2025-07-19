@@ -1,0 +1,116 @@
+.broadcast-list-wrapper {
+  font-family: 'Noto Sans KR', sans-serif;
+  width: 100%;
+  flex: 1;
+  padding: 0;
+  margin: 0;
+  min-height: 100%;
+  box-sizing: border-box;
+}
+
+.section-title {
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+
+.broadcast-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  margin-bottom: 20px;
+}
+
+.broadcast-table thead,
+.broadcast-table th {
+  padding: 12px 16px;
+  border-bottom: 1px solid #e0e0e0;
+  background-color: #e2e2e2;
+  text-align: left;
+}
+
+.broadcast-table tr,
+.broadcast-table td {
+  padding: 12px 16px;
+  border-bottom: 1px solid #e0e0e0;
+  background-color: #ffffff;
+}
+
+.broadcast-table tbody tr:hover {
+  background-color: #f9f9f9;
+}
+
+.rounded-search-bar {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.rounded-search-bar input{
+  width: 500px;
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+
+.rounded-search-bar select{
+  width: 150px;
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.rounded-search-bar
+.search-btn,
+.detail-btn {
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.pagination {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  justify-content: center;
+  overflow-x: auto;
+  white-space: nowrap;
+  width: 100%;
+  scrollbar-width: thin;
+}
+
+.btn-main {
+  background: #2563eb;
+  color: #fff;
+  border: none;
+  border-radius: 7px;
+  font-size: 1.13rem;
+  font-weight: 700;
+  padding: 0.54rem 1.6rem;
+  cursor: pointer;
+  transition: background 0.2s;
+  height: 48px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 2px;
+}
+.btn-main.active,
+.pagination .btn-main.active {
+  background: #1746a2;
+  color: #fff;
+}
+.btn-main:disabled {
+  background: #e5e7eb;
+  color: #b3b9c9;
+  cursor: not-allowed;
+}
+.btn-main:hover {
+  background: #1746a2;
+}

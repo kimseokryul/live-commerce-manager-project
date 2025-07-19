@@ -244,4 +244,104 @@
     	ORDER BY SUM(oi.total_price) desc
     	LIMIT 5
     </select>
+    
+    
+    <select id="getWholeSalesSummaryCard"
+		resultType="org.kosa.shoppingmaillmanager.host.product.dto.MonthlySalesSummaryDto">
+		SELECT
+		COUNT(*) AS totalOrders, -- 주문 수: 배송완료된 주문상품 개수
+		SUM(oi.TOTAL_PRICE) AS totalAmount, -- 총 매출액: 배송완료된 주문상품 총 금액
+		ROUND(SUM(oi.TOTAL_PRICE) / COUNT(*)) AS averageAmount -- 평균 금액
+		FROM
+		tb_order_item oi
+		JOIN tb_product p ON oi.PRODUCT_ID = p.PRODUCT_ID
+		WHERE
+		oi.STATUS = '배송완료'
+		AND
+		DATE_FORMAT(oi.UPDATED_DATE, '%Y-%m') = #{month}
+	</select>
+	
+	<select id="findWholeSalesOrderItems"
+		resultType="org.kosa.shoppingmaillmanager.host.product.dto.SalesOrderItemDto">
+		SELECT
+		DATE_FORMAT(o.ORDER_DATE, '%Y-%m-%d %H:%i:%s') AS orderDate,
+		o.ORDER_ID AS orderId,
+		p.NAME AS productName,
+		oi.QUANTITY AS quantity,
+		o.PAYMENT_METHOD_NAME AS paymentMethodName,
+		oi.TOTAL_PRICE AS totalPrice
+		FROM tb_order o
+		JOIN tb_order_item oi ON o.ORDER_ID = oi.ORDER_ID
+		JOIN tb_product p ON oi.PRODUCT_ID = p.PRODUCT_ID
+		WHERE o.ORDER_STATUS = '배송완료'
+
+		<if test="startDate != null and startDate != ''">
+			AND o.ORDER_DATE &gt;= #{startDate}
+		</if>
+
+		<if test="endDate != null and endDate != ''">
+			AND o.ORDER_DATE &lt;= #{endDate}
+		</if>
+
+		<if test="productKeyword != null and productKeyword != ''">
+			AND p.NAME LIKE CONCAT('%', #{productKeyword}, '%')
+		</if>
+
+		<if
+			test="paymentMethodKeyword != null and paymentMethodKeyword != ''">
+			AND o.PAYMENT_METHOD_NAME LIKE CONCAT('%', #{paymentMethodKeyword}, '%')
+		</if>
+
+		ORDER BY o.ORDER_DATE DESC
+	</select>
+	
+	<select id="getWholeTop5ByQuantity"
+		resultType="org.kosa.shoppingmaillmanager.host.product.dto.TopProductDto">
+		SELECT
+		p.PRODUCT_ID,
+		p.NAME AS productName,
+		SUM(oi.QUANTITY)
+		AS totalQuantity
+		FROM tb_order_item oi
+		JOIN tb_product p ON
+		oi.PRODUCT_ID = p.PRODUCT_ID
+		WHERE oi.STATUS =
+		'배송완료'
+		GROUP BY p.PRODUCT_ID, p.NAME
+		ORDER BY totalQuantity DESC
+		LIMIT 5
+	</select>
+
+	<select id="getWholeTop5BySales"
+		resultType="org.kosa.shoppingmaillmanager.host.product.dto.TopProductDto">
+		SELECT
+		p.PRODUCT_ID,
+		p.NAME AS productName,
+		SUM(oi.TOTAL_PRICE) AS totalSales
+		FROM tb_order_item oi
+		JOIN tb_product
+		p ON oi.PRODUCT_ID = p.PRODUCT_ID
+		WHERE oi.STATUS = '배송완료'
+		GROUP BY p.PRODUCT_ID, p.NAME
+		ORDER BY totalSales
+		DESC
+		LIMIT 5
+	</select>
+
+	<select id="countWholePaymentMethodCounts" resultType="map"
+		parameterType="string">
+		SELECT
+		SUM(CASE WHEN PAYMENT_METHOD_NAME LIKE '%휴대폰%'
+		THEN 1 ELSE 0 END) AS phone,
+		SUM(CASE WHEN PAYMENT_METHOD_NAME LIKE
+		'%페이%' THEN 1 ELSE 0 END) AS
+		pay,
+		SUM(CASE WHEN PAYMENT_METHOD_NAME LIKE
+		'%입금%' THEN 1 ELSE 0 END) AS deposit,
+		SUM(CASE WHEN PAYMENT_METHOD_NAME
+		LIKE '%카드%' THEN 1 ELSE 0 END) AS
+		card
+		FROM tb_order
+		where order_status = '배송완료'
+	</select>
 </mapper>

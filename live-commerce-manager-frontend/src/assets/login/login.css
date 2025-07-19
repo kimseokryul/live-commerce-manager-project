@@ -1,0 +1,103 @@
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background: #f4f6f9;
+}
+
+.login-box {
+  width: 450px;
+  background: white;
+  border: 1px solid #ddd;
+  padding: 2rem;
+  border-radius: 6px;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.05);
+  text-align: center;
+}
+
+.login-header .avatar {
+  font-size: 48px;
+  color: #3b5998;
+  margin-bottom: 0.5rem;
+}
+
+.login-header .avatar-icon {
+  width: 48px;
+  height: 48px;
+}
+
+.login-header h2 {
+  margin-bottom: 1.5rem;
+  color: #333;
+  font-weight: 500;
+}
+
+form input[type="text"],
+form input[type="password"] {
+  width: 100%;
+  padding: 10px 12px;
+  margin-bottom: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+  box-sizing: border-box; 
+  background-color: #fff;
+}
+
+form .options {
+  display: flex;
+  justify-content: space-between;
+  /* justify-content: center; */
+  align-items: center;
+  font-size: 13px;
+  margin-bottom: 1rem;
+}
+
+form .options b {
+  justify-content: center;
+  text-decoration: none;
+  color: #3b5998;
+}
+
+form button {
+  /* all: unset; ❌ 빼버리고 아래처럼 직접 초기화 */
+  appearance: none;
+  border: none;
+  outline: none;
+  background: none;
+
+  display: block;
+  width: 100%;
+  box-sizing: border-box; /* ✅ 이거 꼭 넣어 */
+  background-color: #3b5998;
+  color: white;
+  padding: 10px;
+  border-radius: 4px;
+  font-size: 15px;
+  text-align: center;
+  cursor: pointer;
+  margin-bottom: 1rem;
+}
+
+form button:hover {
+  background-color: #2d4373;
+}
+
+.footer-text {
+  margin-top: 1rem;
+  font-size: 13px;
+}
+
+.footer-text a {
+  color: #3b5998;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.logo-img {
+  width: 300px;
+  height: auto;
+  margin-bottom: 1.5rem;
+  object-fit: contain;
+}

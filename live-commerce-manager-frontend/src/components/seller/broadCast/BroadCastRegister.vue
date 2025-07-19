@@ -1,25 +1,32 @@
 <template>
   <div class="register-wrapper">
+    <!-- 페이지 제목 -->
     <h2 class="title">방송 등록</h2>
+
+    <!-- 양쪽 컬럼 구조 -->
     <div class="form-grid">
 
-      <!-- 왼쪽 영역 -->
+      <!-- 왼쪽: 방송 정보 입력 영역 -->
       <div class="form-left">
+        <!-- 방송자 ID (readonly) -->
         <div class="form-group">
           <label>방송자</label>
           <input type="text" v-model="broadcast.broadcaster_id" readonly />
         </div>
 
+        <!-- 방송 제목 -->
         <div class="form-group">
           <label>제목</label>
           <input type="text" v-model="broadcast.title" />
         </div>
 
+        <!-- 방송 설명 -->
         <div class="form-group">
           <label>설명</label>
           <textarea v-model="broadcast.description"></textarea>
         </div>
 
+        <!-- 공개 여부 라디오 버튼 -->
         <div class="form-group horizontal">
           <div class="radio-group">
             <label><b>공개 여부</b></label>
@@ -28,6 +35,7 @@
           </div>
         </div>
 
+        <!-- 방송 시작/종료 시간 -->
         <div class="form-group horizontal">
           <div class="radio-group2">
             <label>방송 시작 시간<input type="datetime-local" v-model="broadcast.scheduled_start_time" /></label>
@@ -35,6 +43,7 @@
           </div>
         </div>
 
+        <!-- OBS 관련 정보 입력 -->
         <div class="form-group">
           <label>OBS 설치된 PC의 IP</label>
           <input type="text" v-model="broadcast.obs_host" placeholder="OBS를 사용할 PC의 IP를 입력해주세요" />
@@ -45,6 +54,7 @@
           <input type="text" v-model="broadcast.obs_port" placeholder="OBS WebSocket을 연결할 포트번호를 입력해주세요" />
         </div>
 
+        <!-- OBS WebSocket 비밀번호 입력 (눈 아이콘으로 가림/보임 전환) -->
         <div class="form-group">
           <label>OBS WebSocket 비밀번호</label>
           <div class="password-wrapper">
@@ -59,14 +69,16 @@
           </div>
         </div>
 
+        <!-- nginx 서버 호스트 정보 -->
         <div class="form-group">
           <label>서버 IP 주소</label>
           <input type="text" v-model="broadcast.nginx_host" placeholder="docker 설치된 서버 주소 (192.168.4.206)" />
         </div>
       </div>
 
-      <!-- 오른쪽 영역 -->
+      <!-- 오른쪽: 상품 등록 및 썸네일 -->
       <div class="form-right">
+        <!-- 상품 검색 -->
         <div class="form-group">
           <label>상품 등록</label>
           <div class="product-register">
@@ -118,22 +130,7 @@
           </table>
         </div>
 
-        <!-- <div class="form-group">
-          <label>카테고리</label>
-          <select v-model="broadcast.category_id">
-            <option disabled value="">선택</option>
-            <option value="1">신선식품</option>
-            <option value="2">가공식품</option>
-            <option value="3">간편식/밀키트</option>
-            <option value="4">베이커리</option>
-            <option value="5">유제품/음료</option>
-            <option value="6">건강식품</option>
-            <option value="7">주방용품</option>
-            <option value="8">생활용품</option>
-            <option value="9">유아동</option>
-          </select>
-        </div> -->
-
+        <!-- 썸네일 업로드 -->
         <div class="form-group">
           <label>썸네일 업로드</label>
           <div class="thumbnail-box" @click="$refs.thumbnailInput.click()">
@@ -145,26 +142,30 @@
       </div>
     </div>
 
+    <!-- 등록 버튼 -->
     <div class="btn-wrap">
       <button @click="submitForm">방송 등록</button>
     </div>
   </div>
 </template>
 
+
 <script setup>
 import { onMounted, reactive, ref, toRaw } from 'vue'
 import { useRouter } from 'vue-router'
 import axios from 'axios'
+
 const router = useRouter()
 
+// 방송 등록 정보 객체
 const broadcast = reactive({
   broadcast_id: '',
-  broadcaster_id: '',
+  broadcaster_id: '', // 로그인한 사용자 ID
   title: '',
   description: '',
   category_id: '',
   thumbnail_url: '',
-  is_public: '',
+  is_public: '', // 공개 여부
   broadcast_status: '',
   scheduled_start_time: '',
   scheduled_end_time: '',
@@ -172,20 +173,28 @@ const broadcast = reactive({
   obs_port: '4455',
   obs_password: '',
   nginx_host: '',
-  productList: [],
+  productList: [], // 선택된 상품 리스트
 })
 
+// 썸네일 미리보기 이미지 URL
+const thumbnailPreview = ref('')
 
-const thumbnailPreview = ref('') // 미리보기용 로컬 URL
-
+// 상품 검색 키워드 및 결과 리스트
 const searchKeyword = ref('')
 const searchResults = ref([])
+
+// 로그인 토큰
 const token = localStorage.getItem('jwt') || sessionStorage.getItem('jwt')
 
+// 비밀번호 보기/숨기기 토글 상태
 const showPassword = ref(false)
 
+// 공개/비공개 버튼 토글용 함수
+const togglePassword = () => {
+  showPassword.value = !showPassword.value
+}
 
-// broadcaster_id 에 로그인된 id 불러오기
+// 로그인한 사용자 ID 가져오기
 const getUserId = await axios.get('/api/host/me', {
   headers: {
     'Authorization' : `Bearer ${token}`
@@ -193,70 +202,61 @@ const getUserId = await axios.get('/api/host/me', {
 })
 broadcast.broadcaster_id = getUserId.data.user_id
 
-// 방송 등록
+// 방송 등록 함수
 const submitForm = async () => {
   if (!confirm("방송을 등록하시겠습니까?")) return;
 
-  try{
+  try {
     const formData = new FormData()
 
+    // 방송 객체 전송 (JSON → Blob)
     formData.append('broadcast', new Blob([JSON.stringify(toRaw(broadcast))], {
       type: 'application/json'
     }))
-    console.log(toRaw(broadcast))
+
+    // 상품 리스트도 같이 전송
     formData.append('productList', new Blob([JSON.stringify(broadcast.productList)], {
       type: 'application/json'
     }))
 
     const res = await axios.post('/api/broadcast/register', formData, {
-      headers : {
+      headers: {
         'Content-Type' : 'multipart/form-data',
         'Authorization': `Bearer ${token}`,
       }
     })
-    const responseData = res.data
-    console.log(token)
 
-    Object.assign(broadcast, responseData.broadcast);  // broadcast 전체 덮어쓰기 대신 병합
+    const responseData = res.data
+    Object.assign(broadcast, responseData.broadcast) // broadcast 데이터 덮어쓰기
 
     if(responseData.status === "error"){
       alert(responseData.error)
     } else {
       alert('방송 등록 완료!')
-      // router.push(`/broadcast/{broadcast.broadcast_id}`)
-     
       const broadcastUrl = `/broadcast/${broadcast.broadcast_id}`
-
-      console.log("broadcast_id : ", broadcast.broadcast_id)
-      console.log("broadcast: ", broadcast) 
       window.open(broadcastUrl, '_blank', 'width=1500,height=900,resizable=yes')
     }
 
-  }catch(error){
-    alert('방송 등록 실패 '  + (error.response?.data?.message || error.message))
+  } catch (error) {
+    alert('방송 등록 실패 ' + (error.response?.data?.message || error.message))
   }
 }
 
-// 상품명 검색
+// 상품 검색
 const searchProducts = async () => {
   const keyword = searchKeyword.value.trim()
-
-  if(!keyword){
+  if (!keyword) {
     searchResults.value = []
     return
   }
 
   try {
     const res = await axios.get('/api/broadcast/product/search', {
-      params: { 
-        keyword: keyword
-      }
+      params: { keyword }
     })
-    
     searchResults.value = res.data
-    console.log("🔍 searchResults =", searchResults)
-  } catch(error) {
-    console.error("상품 검색 실패 : ", error)
+  } catch (error) {
+    console.error("상품 검색 실패: ", error)
     searchResults.value = []
   }
 }
@@ -264,8 +264,7 @@ const searchProducts = async () => {
 // 상품 추가
 const addProduct = (product) => {
   const exists = broadcast.productList.some(p => p.product_id === product.product.productId)
-  console.log("👉 현재 추가할 product_id:", product.product.productId);
-  if(!exists){
+  if (!exists) {
     broadcast.productList.push({
       product_id: product.product.productId,
       product: {
@@ -274,23 +273,22 @@ const addProduct = (product) => {
         mainImage: product.product.mainImage || '',
       }
     })
-    console.log("선택된 product_id:", product.product_id)
   }
 }
 
-// 상품 삭제
+// 선택 상품 삭제
 const removeProduct = (index) => {
   broadcast.productList.splice(index, 1)
 }
 
-// 파일 업로드 메소드
+// 썸네일 이미지 파일 업로드
 const handleFileUpload = async (e) => {
   const file = e.target.files[0]
   if (!file) return;
 
   const formData = new FormData()
   formData.append("file", file)
-  
+
   try {
     const res = await axios.post("/api/broadcast/uploads/thumbnail", formData, {
       headers: {
@@ -299,40 +297,24 @@ const handleFileUpload = async (e) => {
     })
     const { url } = res.data
     thumbnailPreview.value = `http://localhost:8080${url}`
-    broadcast.thumbnail_url = res.data.url // 서버가 url 반환
-
-    console.log('preview URL:', thumbnailPreview.value)
+    broadcast.thumbnail_url = res.data.url
   } catch(error){
     console.error("썸네일 업로드 실패: ", error)
     alert("썸네일 업로드 실패")
   }
 }
 
-
-// 스트림 키 보여주기
-const togglePassword = () => {
-  showPassword.value = !showPassword.value
-}
-
-// 스트림 키 복사
-const copyStreamKey = async () => {
-  try {
-    await navigator.clipboard.writeText(broadcast.stream_key)
-    alert('스트림 키 복사 완료!')
-  } catch (err) {
-    alert('복사 실패')
-  }
-}
-
+// 이미지 URL 전체 경로 생성
 function getFullImageUrl(path) {
-  return `http://localhost:8080${path}`;  // 백엔드 주소에 맞게 변경!
+  return `http://localhost:8080${path}`
 }
 
-
+// 컴포넌트 로드시 초기 상품 검색 실행
 onMounted(() => {
   searchProducts()
 })
 </script>
+
 
 <style scoped>
 /* 전체 레이아웃 */

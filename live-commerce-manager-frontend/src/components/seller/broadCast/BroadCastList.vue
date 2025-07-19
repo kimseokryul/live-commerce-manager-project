@@ -1,12 +1,15 @@
 <template>
   <div class="broadcast-list-wrapper">
+    <!-- 방송 목록 타이틀 -->
     <h2 class="section-title">나의 방송 목록</h2>
-    <!-- 검색 섹션 -->
+
+    <!-- 검색 영역: 검색어 입력 및 검색 버튼 -->
     <div class="rounded-search-bar">
       <input type="text" v-model="searchParams.searchValue" placeholder="검색어 입력" />
       <button class="search-btn" @click="searchBroadcast">🔍</button>
     </div>
 
+    <!-- 방송 목록 테이블 -->
     <table class="broadcast-table">
       <thead>
         <tr>
@@ -23,6 +26,7 @@
           <td>{{ index + 1 }}</td>
           <td>{{ broadcast.category_name }}</td>
           <td>
+            <!-- 방송 상세 페이지로 이동 -->
             <router-link :to="`/broadcast/detail/${broadcast.broadcast_id}`">
               {{ broadcast.title }}
             </router-link>
@@ -34,48 +38,51 @@
       </tbody>
     </table>
 
+    <!-- 페이지네이션 -->
     <div class="pagination">
       <button class="btn-main"
-      :disabled="currentPage === 1" 
-      @click="goToPage(currentPage - 1)">이전</button>
-      <button
-        v-for="page in totalPages"
-        :key="page"
-        :class="['btn-main', { active: page === currentPage }]"
-        @click="goToPage(page)"
-      >
+              :disabled="currentPage === 1" 
+              @click="goToPage(currentPage - 1)">이전</button>
+
+      <button v-for="page in totalPages"
+              :key="page"
+              :class="['btn-main', { active: page === currentPage }]"
+              @click="goToPage(page)">
         {{ page }}
       </button>
 
       <button class="btn-main" 
-      :disabled="currentPage === totalPages" 
-      @click="goToPage(currentPage + 1)">다음</button>
+              :disabled="currentPage === totalPages" 
+              @click="goToPage(currentPage + 1)">다음</button>
     </div>
   </div>
 </template>
 
+
 <script setup>
+// 외부 라이브러리 및 Composition API 함수 import
 import axios from 'axios'
 import { onMounted, reactive, ref } from 'vue'
 
-const searchParams = reactive(
-  {
-    pageNo: 1,
-    size: 10,
-    searchValue: '',
-    broadcast_id: '',
-    title: '',
-    broadcaster_id: '',
-    created_at: '',
-    total_viewers: '',
-    category_id: '',
-  }
-)
+// 검색 조건 및 페이징 관련 상태를 reactive 객체로 관리
+const searchParams = reactive({
+  pageNo: 1,              // 현재 페이지 번호
+  size: 10,               // 페이지 당 항목 수
+  searchValue: '',        // 검색어
+  broadcast_id: '',       // 방송 ID (사용 안함)
+  title: '',              // 방송 제목 (사용 안함)
+  broadcaster_id: '',     // 방송자 ID (사용 안함)
+  created_at: '',         // 생성일 (사용 안함)
+  total_viewers: '',      // 시청자 수 (사용 안함)
+  category_id: '',        // 카테고리 ID (사용 안함)
+})
 
-const broadcasts = ref([])
-const totalPages = ref(0)
-const currentPage = ref(1)
+// 방송 목록과 페이지네이션 상태 변수
+const broadcasts = ref([])        // 방송 목록 배열
+const totalPages = ref(0)         // 전체 페이지 수
+const currentPage = ref(1)        // 현재 선택된 페이지 번호
 
+// 날짜 포맷 변경 함수: yyyy.mm.dd 형식으로 변경
 const formatDate = (dateStr) => {
   const date = new Date(dateStr)
   return date.toLocaleDateString('ko-KR', {
@@ -85,38 +92,43 @@ const formatDate = (dateStr) => {
   })
 }
 
+// 방송 목록 요청 API (검색어, 페이지 포함)
 const broadcastList = async () => {
   try {
     const response = await axios.get('/api/broadcast/list', {
-     params: searchParams
-    })   
+      params: searchParams
+    })
+    // 응답 데이터 바인딩
     broadcasts.value = response.data.list
     totalPages.value = response.data.totalPage
-
   } catch (e) {
-      alert('데이터를 불러오는 중 오류 발생')
-      console.error(e)
-    }
+    alert('데이터를 불러오는 중 오류 발생')
+    console.error(e)
+  }
 }
 
+// 페이지 전환 처리
 const goToPage = (page) => {
+  // 유효 범위 내에서만 페이지 이동 허용
   if (page < 1 || page > totalPages.value) return
   currentPage.value = page
   searchParams.pageNo = page
-  broadcastList(page)
+  broadcastList()
 }
 
+// 검색 버튼 클릭 시 동작 (1페이지부터 새로 조회)
 const searchBroadcast = () => {
   searchParams.pageNo = 1
   currentPage.value = 1
   broadcastList()
 }
 
+// 페이지 진입 시 방송 목록 조회
 onMounted(() => {
   broadcastList()
 })
-
 </script>
+
 
 <style scoped>
 .broadcast-list-wrapper {
