@@ -11,11 +11,10 @@ RUN npm run build
 # 2단계: RTMP 모듈 포함 Nginx 사용
 FROM tiangolo/nginx-rtmp:latest AS production-stage
 
-RUN mkdir -p /opt/data/hls
+RUN mkdir -p /opt/data/hls/live
 
 # ✅ 설정파일 복사
 COPY nginx.conf /etc/nginx/nginx.conf
-COPY default.conf /etc/nginx/conf.d/default.conf
 
 # ✅ 빌드된 정적파일 복사
 COPY --from=build-stage /app/dist /usr/share/nginx/html

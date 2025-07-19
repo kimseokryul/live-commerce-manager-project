@@ -20,6 +20,7 @@ services:
     restart: always
     depends_on:
       - redis
+      - rtmp-server
 
   frontend:
     image: kimseokryul/frontend-app
@@ -35,3 +36,13 @@ services:
     container_name: redis
     ports:
       - "6379:6379"
+
+  rtmp-server:
+    image: alfg/nginx-rtmp
+    container_name: rtmp-server
+    ports:
+      - "1935:1935"
+      - "8090:80"
+    volumes:
+      - /opt/data/hls:/opt/data/hls
+    restart: always
