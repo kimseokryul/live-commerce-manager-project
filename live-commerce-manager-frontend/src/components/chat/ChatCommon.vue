@@ -182,7 +182,7 @@ let chatSubscription = null;
 
 
 const stompClient = new Client({
-  webSocketFactory: () => new SockJS('http://52.78.97.103:8081/ws-chat'),
+  webSocketFactory: () => new SockJS('http://3.39.101.58:8081/ws-chat'),
   reconnectDelay: 5000,
   onConnect: () => {
     // 📌 채팅 메시지 구독
