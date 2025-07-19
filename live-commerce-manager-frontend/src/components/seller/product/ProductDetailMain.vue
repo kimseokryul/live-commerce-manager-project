@@ -199,8 +199,7 @@ async function saveEdit(field) {
 // --- 이벤트 ---
 function getImageUrl(src) {
   if (!src) return '/default-image.png';
-  // 이미 http로 시작하면 그대로, 아니면 백엔드 주소 붙이기
-  return src.startsWith('http') ? src : `http://localhost:8080${src}`;
+  return src.startsWith('http') ? src : `http://3.39.101.58:8081${src}`;
 }
 function editField(field) {
   editTarget.value = field;
