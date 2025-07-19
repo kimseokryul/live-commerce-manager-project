@@ -268,8 +268,8 @@ const allSelected = computed(() =>
   pagedProducts.value.every(p => selectedProducts.value.includes(p.productId))
 )
 function getImageUrl(src) {
-  if (!src) return '/default-image.png'
-  return src.startsWith('http') ? src : `http://localhost:8080${src}`
+  if (!src) return '/default-image.png';
+  return src.startsWith('http') ? src : `http://3.39.101.58:8081${src}`;
 }
 // --- UI 이벤트 ---
 function setStatusTab(tabValue) {
