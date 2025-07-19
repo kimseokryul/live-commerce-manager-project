@@ -1,4 +1,5 @@
 <script setup>
+// 필요한 Vue 및 외부 라이브러리 import
 import { ref, computed, watch, onMounted } from 'vue'
 import { Line } from 'vue-chartjs'
 import axios from 'axios'
@@ -14,7 +15,7 @@ import {
   Filler
 } from 'chart.js'
 
-// ChartJS 플러그인 등록
+// Chart.js에 필요한 구성 요소 등록
 ChartJS.register(
   Title,
   Tooltip,
@@ -26,20 +27,21 @@ ChartJS.register(
   Filler
 )
 
-const viewType = ref('daily') // 'daily' or 'monthly'
+// 일별 또는 월별 보기 설정
+const viewType = ref('daily') // 'daily' 또는 'monthly' 선택
 
-// 데이터
-const salesList = ref([])
-const totalSales = ref(0)
-const averageSales = ref(0)
-const maxSales = ref(0)
-const maxLabel = ref('')
+// 백엔드에서 가져온 매출 관련 데이터 변수
+const salesList = ref([])            // 전체 매출 리스트
+const totalSales = ref(0)            // 총 매출액
+const averageSales = ref(0)          // 평균 매출액
+const maxSales = ref(0)              // 최고 매출액
+const maxLabel = ref('')             // 최고 매출을 기록한 날짜 또는 월
 
-// 라벨 및 매출값 추출
+// 차트에 표시할 라벨과 값 계산 (computed)
 const chartLabels = computed(() => salesList.value.map(d => d.label))
 const chartValues = computed(() => salesList.value.map(d => d.totalSales))
 
-// 최고 매출 계산
+// 최고 매출액 및 해당 라벨 추적
 watch(chartValues, () => {
   const max = Math.max(...chartValues.value)
   maxSales.value = max
@@ -47,8 +49,9 @@ watch(chartValues, () => {
   maxLabel.value = chartLabels.value[idx] || ''
 })
 
-// ✅ Axios로 매출 데이터 요청
+// 백엔드 API로부터 매출 데이터 요청 함수
 const fetchData = async () => {
+  // 엔드포인트 선택 (일별/월별)
   const endpoint = viewType.value === 'daily'
     ? '/api/dashboard/admin/sales/daily'
     : '/api/dashboard/admin/sales/monthly'
@@ -65,6 +68,7 @@ const fetchData = async () => {
     const list = res.data
     salesList.value = list
 
+    // 총합, 평균, 최고 매출 계산
     const total = list.reduce((sum, cur) => sum + cur.totalSales, 0)
     const avg = list.length > 0 ? Math.round(total / list.length) : 0
     const maxObj = list.reduce((max, cur) =>
@@ -80,10 +84,11 @@ const fetchData = async () => {
   }
 }
 
+// 페이지 로딩 및 viewType 변경 시 데이터 재요청
 onMounted(fetchData)
 watch(viewType, fetchData)
 
-// 차트 데이터 구성
+// 차트에 전달할 데이터 구성
 const chartData = computed(() => ({
   labels: chartLabels.value,
   datasets: [
@@ -100,7 +105,7 @@ const chartData = computed(() => ({
   ]
 }))
 
-// 차트 옵션
+// 차트 옵션 정의
 const chartOptions = computed(() => ({
   responsive: true,
   maintainAspectRatio: false,
@@ -141,22 +146,22 @@ const chartOptions = computed(() => ({
 
 <template>
   <div class="sales-chart-container">
-    <!-- 헤더 -->
+    <!-- 상단 탭 및 제목 -->
     <div class="chart-header">
       <div class="tab-buttons">
         <button :class="{ active: viewType === 'daily' }" @click="viewType = 'daily'">📅 일별</button>
         <button :class="{ active: viewType === 'monthly' }" @click="viewType = 'monthly'">🗓 월별</button>
       </div>
       <div class="chart-title">📈 매출 그래프</div>
-      <router-link to="/sellerSales" class="more-link">더보기</router-link>
+      <router-link to="/admin/sellerSales" class="more-link">더보기</router-link>
     </div>
 
-    <!-- 차트 -->
+    <!-- 라인 차트 영역 -->
     <div class="chart-wrapper">
       <Line :data="chartData" :options="chartOptions" />
     </div>
 
-    <!-- 요약 -->
+    <!-- 요약 정보 박스 -->
     <div class="summary-box">
       <div>총 매출액: <strong>{{ totalSales.toLocaleString() }}원</strong></div>
       <div>평균 매출액: <strong>{{ averageSales.toLocaleString() }}원</strong></div>
@@ -167,6 +172,7 @@ const chartOptions = computed(() => ({
     </div>
   </div>
 </template>
+
 
 <style scoped>
 .sales-chart-container {

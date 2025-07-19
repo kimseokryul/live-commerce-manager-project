@@ -2,14 +2,10 @@ package org.kosa.shoppingmaillmanager.host.broadcast;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.Inet4Address;
-import java.net.InetAddress;
-import java.net.NetworkInterface;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,9 +32,15 @@ import org.springframework.web.multipart.MultipartFile;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+@Tag(
+		  name = "호스트 방송 관리 API",
+		  description = "호스트가 방송을 등록하고, 송출 및 녹화 제어, 썸네일 업로드, 방송 목록 및 상세 조회 등의 기능을 제공합니다."
+		)
 @Slf4j
 @RestController
 @RequiredArgsConstructor
@@ -52,6 +54,7 @@ public class BroadCastController {
 	private static final String UPLOAD_DIR = "/opt/data/upload/";
     
     // 방송 등록
+	@Operation(summary = "방송 등록", description = "OBS 연결 정보와 상품 리스트를 포함한 방송을 등록합니다.")
     @PostMapping("/register")
     public ResponseEntity<?> register(
         @RequestPart("broadcast") BroadCast broadCast,
@@ -103,6 +106,7 @@ public class BroadCastController {
     }
 	
 	// 썸네일 업로드 요청 처리
+	@Operation(summary = "썸네일 이미지 업로드", description = "방송용 썸네일 이미지를 서버에 업로드합니다. 반환된 URL은 방송 등록 시 사용됩니다.")
 	@PostMapping("/uploads/thumbnail")
 	public ResponseEntity<?> uploadThumbnail(
 			@RequestParam("file") MultipartFile file){
@@ -146,6 +150,7 @@ public class BroadCastController {
 	
 	
 	 // 상품명 키워드 검색
+	@Operation(summary = "상품 검색", description = "방송에 등록할 상품을 키워드로 검색합니다.")
     @GetMapping("/product/search")
     public ResponseEntity<List<BroadCastProduct>> searchProducts(@RequestParam String keyword) {
         List<BroadCastProduct> result = broadCastService.findByKeyword(keyword);
@@ -153,6 +158,7 @@ public class BroadCastController {
     }
     
     // 방송 정보 불러오기
+	@Operation(summary = "방송 상세 조회", description = "방송 ID로 방송 상세 정보를 조회합니다. 본인 방송이 아니면 접근이 제한됩니다.")
     @GetMapping("/{broadcast_id}")
     public ResponseEntity<?> getBroadcastDetail(@PathVariable("broadcast_id") int broadcast_id) throws Exception {
     	
@@ -240,6 +246,7 @@ public class BroadCastController {
      * @param req 방송 ID를 포함한 요청 데이터 (JSON Body)
      * @return 방송 시작 성공/실패 응답
      */
+    @Operation(summary = "방송 시작", description = "방송 ID를 기준으로 OBS를 통해 실시간 송출을 시작합니다.")
     @PostMapping("/start")
     public ResponseEntity<?> startBroadcast(@RequestBody Map<String, Object> req) {
 
@@ -289,6 +296,7 @@ public class BroadCastController {
      * @param req 방송 ID를 포함한 요청 데이터 (JSON Body)
      * @return 방송 중지 성공/실패 응답
      */
+    @Operation(summary = "방송 중지", description = "방송 ID를 기준으로 OBS 송출을 중지합니다.")
     @PostMapping("/stop")
     public ResponseEntity<?> stopBroadcast(@RequestBody Map<String, Object> req) {
 
@@ -337,6 +345,7 @@ public class BroadCastController {
      * @param req 방송 ID를 포함한 요청 데이터 (JSON Body)
      * @return 녹화 시작 성공/실패 응답
      */
+    @Operation(summary = "녹화 시작", description = "방송 ID를 기준으로 녹화를 시작합니다.")
     @PostMapping("/live")
     public ResponseEntity<?> recordStartBroadcast(@RequestBody Map<String, Object> req) {
 
@@ -378,6 +387,7 @@ public class BroadCastController {
      * @param req 방송 ID를 포함한 요청 데이터 (JSON Body)
      * @return 녹화 중지 성공/실패 응답
      */
+    @Operation(summary = "녹화 중지", description = "방송 ID를 기준으로 녹화를 중지합니다.")
     @PostMapping("/ended")
     public ResponseEntity<?> recordStopBroadcast(@RequestBody Map<String, Object> req) {
 
@@ -411,12 +421,14 @@ public class BroadCastController {
         }
     }
     
+    @Operation(summary = "방송 시청자 수 조회", description = "해당 방송의 실시간 시청자 수를 Redis에서 조회합니다.")
     @GetMapping("/{broadcast_id}/viewer-count")
     public ResponseEntity<Long> getViewerCount(@PathVariable int broadcast_id) {
     	long count = redisService.getCount(broadcast_id);
         return ResponseEntity.ok(count);
     }
     
+    @Operation(summary = "방송 목록 조회", description = "로그인된 호스트 사용자의 전체 방송 목록을 조회합니다.")
     @GetMapping("/list")
     public ResponseEntity<PageResponseVO<BroadCastListDTO>> broadcastList(
     		@ModelAttribute BroadCastListDTO dto){
@@ -429,6 +441,7 @@ public class BroadCastController {
     }
     
     // 방송 정보 불러오기
+    @Operation(summary = "방송 상세 정보(뷰용) 조회", description = "프론트에서 방송 상세 화면을 띄우기 위한 방송 정보를 조회합니다.")
     @GetMapping("/detail/{broadcast_id}")
     public ResponseEntity<?> getBroadcastDetailView(@PathVariable("broadcast_id") int broadcastId) {
         BroadCast broadcast = broadCastService.getBroadcastDetailsView(broadcastId);
@@ -436,6 +449,7 @@ public class BroadCastController {
     }
     
     // 방송 상태 변경
+    @Operation(summary = "방송 상태 변경", description = "방송의 상태 값을 변경합니다. (예: 준비중 → 시작됨)")
     @PutMapping("/status")
     public ResponseEntity<?> updateStatus(@RequestBody BroadCast broadCast) {
     	// 1. 인증된 사용자 정보 꺼냄

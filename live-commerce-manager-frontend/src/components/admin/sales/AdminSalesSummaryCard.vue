@@ -1,48 +1,78 @@
-<!-- src/views/admin/sales/SalesSummaryCard.vue -->
 <template>
-  <div class="summary-cards">
-    <div class="summary-card">
-      <span>💰 총 매출</span>
-      <strong>₩{{ totalSales.toLocaleString() }}</strong>
-    </div>
-    <div class="summary-card">
-      <span>📦 총 주문 수</span>
-      <strong>{{ totalOrders }}</strong>
-    </div>
-    <div class="summary-card">
-      <span>📈 평균 주문액</span>
-      <strong>₩{{ avgOrderAmount.toLocaleString() }}</strong>
+  <div class="summary-card">
+    <h3 class="summary-title">📊 이번 달 매출 현황</h3>
+    <div class="summary-stats">
+      <div class="summary-item">
+        <span class="label">총 판매량</span>
+        <span class="value">{{ totalOrders.toLocaleString() }}건</span>
+      </div>
+      <div class="summary-item">
+        <span class="label">총 매출액</span>
+        <span class="value">{{ totalAmount.toLocaleString() }}원</span>
+      </div>
+      <div class="summary-item">
+        <span class="label">평균 결제금액</span>
+        <span class="value">{{ averageAmount.toLocaleString() }}원</span>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup>
-defineProps({
-  totalSales: Number,
-  totalOrders: Number,
-  avgOrderAmount: Number
-});
+import { ref, onMounted } from 'vue'
+import axios from 'axios'
+
+const totalOrders = ref(0)
+const totalAmount = ref(0)
+const averageAmount = ref(0)
+
+onMounted(async () => {
+  const token = localStorage.getItem('jwt') || sessionStorage.getItem('jwt')
+  if (!token) return
+
+  const now = new Date()
+  const yearMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`
+
+  try {
+    const res = await axios.get('/api/dashboard/admin/sales/summary-card', {
+      params: { month: yearMonth },
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+    totalOrders.value = res.data.totalOrders
+    totalAmount.value = res.data.totalAmount
+    averageAmount.value = res.data.averageAmount
+  } catch (e) {
+    console.error('카드1 매출 요약 정보 가져오기 실패:', e)
+  }
+})
 </script>
 
 <style scoped>
-.summary-cards {
+.summary-title {
+  font-size: 1.6rem;
+  font-weight: bold;
+  margin-bottom: 4rem;
+}
+
+.summary-stats {
   display: flex;
-  gap: 1rem;
+  flex-direction: column;
+  gap: 0.8rem;
 }
-.summary-card {
-  flex: 1;
-  background: #fff;
-  padding: 1rem;
-  border-radius: 12px;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-  text-align: center;
+
+.summary-item {
+  display: flex;
+  justify-content: space-between;
+  font-size: 1.1rem;
 }
-.summary-card span {
-  display: block;
-  color: #555;
-  margin-bottom: 0.5rem;
+
+.label {
+  font-weight: 400;
 }
-.summary-card strong {
-  font-size: 1.2rem;
+
+.value {
+  font-weight: bold;
 }
 </style>

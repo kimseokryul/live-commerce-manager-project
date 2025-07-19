@@ -52,6 +52,10 @@ public class BroadCastService {
 
 	private final SimpMessagingTemplate messagingTemplate;
 
+	/**
+	 * 방송 등록 로직
+	 * @param broadCast
+	 */
 	@Transactional
 	public void register(BroadCast broadCast) {
 		// 1. stream_key가 null이거나 비어 있으면 → 새로 생성
@@ -59,7 +63,7 @@ public class BroadCastService {
 			// 스트림키 생성
 			String rawKey = UUID.randomUUID().toString();
 			try {
-				String encryptedKey = AESUtil.encrypt(rawKey);
+				String encryptedKey = AESUtil.encrypt(rawKey); // 스트림 키 암호화
 				broadCast.setStream_key(encryptedKey); // 암호화된 값 저장
 				// hls_url : 방송 송출 url
 				String hls_url = "http://" + broadCast.getNginx_host() + ":8090/live/" + rawKey
@@ -85,14 +89,31 @@ public class BroadCastService {
 		}
 	}
 
+	/**
+	 * 상품 검색 로직
+	 * 키워드를 검색하여 상품 검색
+	 * @param keyword
+	 * @return
+	 */
 	public List<BroadCastProduct> findByKeyword(String keyword) {
 		return broadCastDAO.findByKeyword(keyword); // LIKE 검색용으로 감싸기
 	}
 
+	/**
+	 *  방송 단건 조회 (방송 ID 기준)
+	 * @param broadcast_id 방송 고유 ID
+	 * @return BroadCast 엔티티 객체
+	 */
 	public BroadCast findById(int broadcast_id) {
 		return broadCastDAO.findById(broadcast_id);
 	}
 
+	/**
+	 *  방송 상세 정보 조회 (상품 목록, 시청자 목록 포함)
+	 * - 방송 카테고리는 상품의 상위 카테고리 기준으로 갱신
+	 * @param broadcast_id 방송 고유 ID
+	 * @return BroadCast (상품 + 시청자 리스트 포함)
+	 */
 	@Transactional
 	public BroadCast getBroadcastDetails(int broadcast_id) {
 		BroadCast broadcast = broadCastDAO.findBroadcastById(broadcast_id);
@@ -102,44 +123,59 @@ public class BroadCastService {
 
 		List<BroadCastProduct> products = broadCastDAO.findProductsByBroadcastId(broadcast_id);
 		List<BroadCastViewer> viewers = broadCastDAO.findViewersByBroadcastId(broadcast_id);
-		broadCastDAO.updateBroadcastCategoryByTopProductCategory(broadcast_id);
+		broadCastDAO.updateBroadcastCategoryByTopProductCategory(broadcast_id); // 카테고리 자동 설정
 
 		broadcast.setProductList(products);
 		broadcast.setViewerList(viewers);
-
 		return broadcast;
 	}
 
+	/**
+	 * 방송 상태 변경 + 실시간 WebSocket 알림 전송
+	 * @param broadCast 상태값이 담긴 BroadCast 객체
+	 */
 	public void updateStatus(BroadCast broadCast) {
-
 		broadCastDAO.updateStatus(broadCast);
-
-		messagingTemplate.convertAndSend("/topic/broadcast/" + broadCast.getBroadcast_id() + "/status",
-				Map.of("status", broadCast.getBroadcast_status()));
+		messagingTemplate.convertAndSend(
+			"/topic/broadcast/" + broadCast.getBroadcast_id() + "/status",
+			Map.of("status", broadCast.getBroadcast_status())
+		);
 	}
 
 
-	// 시청자 입장 메소드
+	/**
+	 * 시청자 입장 처리
+	 * - DB 저장 + Redis 실시간 시청자 수 증가
+	 */
 	public void onViewerJoined(int broadcastId, BroadCastViewer viewer) {
 		broadCastDAO.insertViewer(viewer);
 		redisService.increase(broadcastId);
 	}
 
-	// 시청자 퇴장 메소드
+	/**
+	 * 시청자 퇴장 처리
+	 * - 퇴장 시간 기록 + Redis 시청자 수 감소
+	 */
 	public void onViewerLeft(int broadcast_id, String user_id) {
 		broadCastDAO.updateLeftTime(user_id, broadcast_id);
 		redisService.decrease(broadcast_id);
 	}
 
-	// 방송 종료 메소드
+	/**
+	 *  방송 종료 처리
+	 * - Redis에 저장된 최종 시청자 수를 DB에 저장 + 캐시 제거
+	 */
 	public void onBroadcastEnd(int broadcast_id) {
 		long total = redisService.getCount(broadcast_id);
 		broadCastDAO.updateTotalViewersManual(broadcast_id, total);
 		redisService.remove(broadcast_id); // 캐시 제거
 	}
 
+	/**
+	 * 방송 목록 조회 (관리자 or 호스트용)
+	 * - 페이징, 검색, 필터 포함
+	 */
 	public PageResponseVO<BroadCastListDTO> list(BroadCastListDTO dto) {
-
 		int start = (dto.getPageNo() - 1) * dto.getSize();
 
 		Map<String, Object> map = new HashMap<>();
@@ -155,10 +191,13 @@ public class BroadCastService {
 
 		List<BroadCastListDTO> list = broadCastDAO.findBroadcastList(map);
 		int total = broadCastDAO.countBroadcastList(map);
-
 		return new PageResponseVO<>(dto.getPageNo(), list, total, dto.getSize());
 	}
 
+	/**
+	 *  방송 상세 조회 (수정 화면용)
+	 * - 상품 + 카테고리 이름 포함
+	 */
 	@Transactional(readOnly = true)
 	public BroadCast getBroadcastDetailsView(int broadcast_id) {
 		BroadCast broadcast = broadCastDAO.findBroadcastById(broadcast_id);
@@ -166,17 +205,19 @@ public class BroadCastService {
 			throw new IllegalArgumentException("존재하지 않는 방송입니다.");
 		}
 
-		broadCastDAO.findProductsByBroadcastId(broadcast_id);
-
 		List<BroadCastProduct> products = broadCastDAO.findProductsByBroadcastId(broadcast_id);
 		String category_name = broadCastDAO.findCategoryName(broadcast.getCategory_id());
 
 		broadcast.setCategory_name(category_name);
 		broadcast.setProductList(products);
-
 		return broadcast;
 	}
-
+	
+	/**
+	 * 녹화된 영상 파일의 URL을 DB에 저장
+	 * @param broadcastId 방송 ID
+	 * @param videoUrl 영상 스트리밍 경로
+	 */
 	@Transactional
 	public void updateVideoUrl(int broadcastId, String videoUrl) {
 		broadCastDAO.updateVideoUrl(broadcastId, videoUrl);
@@ -331,10 +372,13 @@ public class BroadCastService {
 		    });
 		}
 
-	public void updateStreamUrl(BroadCast b) {
-		broadCastDAO.updateStreamUrl(b);
-	}
-	
+		/**
+		 * 🔁 방송 스트림 URL 변경 (필요 시 수동 갱신)
+		 * @param b BroadCast 객체
+		 */
+		public void updateStreamUrl(BroadCast b) {
+			broadCastDAO.updateStreamUrl(b);
+		}
 	
 	
 	/**

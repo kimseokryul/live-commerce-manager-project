@@ -17,9 +17,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+@Tag(
+		  name = "호스트 주문 관리 API",
+		  description = "호스트(판매자)가 자신의 상품 주문 목록을 조회하고, 상세 조회 및 주문자 정보 수정, 주문 취소 등의 기능을 수행합니다."
+		)
 @Slf4j
 @RestController
 @RequiredArgsConstructor
@@ -28,6 +34,7 @@ public class OrderController {
 	private final OrderService orderService;
 	private final UserDAO userDAO;
 	
+	@Operation(summary = "주문 목록 조회", description = "호스트의 전체 주문 목록을 필터 및 정렬 조건에 따라 조회합니다.")
 	@GetMapping("/")
 	public ResponseEntity<PageResponseVO<OrderListDTO>> orderList(
 			@RequestParam(defaultValue = "1") int pageNo, 
@@ -56,6 +63,7 @@ public class OrderController {
         return ResponseEntity.ok(pageResponse);
 	}
 	
+	@Operation(summary = "주문 상세 조회", description = "주문 ID를 기반으로 해당 주문의 상세 정보를 조회합니다.")
 	@GetMapping("/detail")
 	public ResponseEntity<OrderDetailDTO> orderDetail(@RequestParam String order_id){
 		OrderDetailDTO order = orderService.getOrder(order_id);
@@ -67,17 +75,14 @@ public class OrderController {
 	    return ResponseEntity.ok(order); // 200 + JSON 바디
 	}
 	
+	@Operation(summary = "사용자 주문 내역 조회", description = "특정 사용자 ID로 해당 사용자의 주문 내역을 조회합니다.")
 	@GetMapping("/user-detail")
 	public ResponseEntity<List<OrderByUserDTO>> userDetail(@RequestParam String user_id){
 		List<OrderByUserDTO> order = orderService.getOrderByUser(user_id);
-		
-//		if (order == null) {
-//			return ResponseEntity.ok(order); // 빈 객체 반환
-//	    }
-
 	    return ResponseEntity.ok(order); // 200 + JSON 바디
 	}
 	
+	@Operation(summary = "수령인 정보 수정", description = "주문 상세 정보에서 수령인의 이름, 연락처, 주소 등을 수정합니다.")
 	@PutMapping("/detail")
 	public ResponseEntity<String> updateRecipientInfo(@RequestBody OrderDetailDTO orderDetailDTO) {
 	    boolean success = orderService.updateRecipient(orderDetailDTO);
@@ -89,6 +94,7 @@ public class OrderController {
 	    }
 	}
 	
+	@Operation(summary = "주문 취소 (단건)", description = "주문 ID로 특정 주문을 취소합니다.")
 	@DeleteMapping("/{order_id}")
 	public ResponseEntity<String> cancelOrder(@PathVariable("order_id") String order_id) {
 	    boolean isCancelled = orderService.cancelOrder(order_id);
@@ -100,6 +106,7 @@ public class OrderController {
 	    }
 	}
 	
+	@Operation(summary = "주문 취소 (다건)", description = "선택된 여러 주문을 한 번에 취소합니다.")
 	@DeleteMapping
 	public ResponseEntity<?> cancelMultipleOrders(@RequestBody List<String> order_ids) {
 	    orderService.cancelOrders(order_ids);
