@@ -13,28 +13,27 @@ public class FileStorageService {
     // 실제 저장 경로 (운영에서는 외부 경로로 분리 권장)
 	private final String uploadDir = "/opt/data/upload/product/";
 
-    public String store(MultipartFile file) throws IOException {
-        String uploadDir = "C:/upload/product/main/"; // 실제 저장 경로
-        File dir = new File(uploadDir);
-        if (!dir.exists()) {
-            dir.mkdirs();
-        }
+	public String store(MultipartFile file) throws IOException {
+	    File dir = new File(uploadDir);
+	    if (!dir.exists()) {
+	        dir.mkdirs();
+	    }
 
-        String originalFilename = file.getOriginalFilename();
-        String extension = "";
-        if (originalFilename != null && originalFilename.contains(".")) {
-            extension = originalFilename.substring(originalFilename.lastIndexOf("."));
-        }
+	    String originalFilename = file.getOriginalFilename();
+	    String extension = "";
+	    if (originalFilename != null && originalFilename.contains(".")) {
+	        extension = originalFilename.substring(originalFilename.lastIndexOf("."));
+	    }
 
-        String uuid = UUID.randomUUID().toString();
-        String newFileName = uuid + extension;
+	    String uuid = UUID.randomUUID().toString();
+	    String newFileName = uuid + extension;
 
-        File destination = new File(uploadDir + newFileName);
-        file.transferTo(destination);
+	    File destination = new File(uploadDir + newFileName);
+	    file.transferTo(destination);
 
-        // ✅ DB에 저장할 경로 (URL 또는 상대경로)
-        return "/upload/product/main/" + newFileName;
-    }
+	    // ✅ 클라이언트에 반환할 URL 또는 상대경로
+	    return "/upload/product/main/" + newFileName;
+	}
 
 }
 
