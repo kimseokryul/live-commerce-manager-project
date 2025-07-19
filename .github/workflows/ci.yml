@@ -76,17 +76,17 @@ jobs:
       # ✅ EC2 서버로 SSH 접속하여 배포 스크립트 실행
       - name: Deploy on EC2 via SSH
         run: |
-          ssh -o StrictHostKeyChecking=no -i ec2-key.pem ubuntu@${{ secrets.EC2_HOST }} << 'EOF'
+          ssh -o StrictHostKeyChecking=no -i ec2-key.pem ubuntu@${{ secrets.EC2_HOST }} << EOF
             cd ~/live-commerce-manager-project
             git pull origin main
-            cat <<EOT > .env
-            DB_HOST=${DB_HOST}
-            DB_PORT=${DB_PORT}
-            DB_NAME=${DB_NAME}
-            DB_USERNAME=${DB_USERNAME}
-            DB_PASSWORD=${DB_PASSWORD}
-            JWT_SECRET=${JWT_SECRET}
-            EOT
+            
+            echo "DB_HOST=${DB_HOST}" > .env
+            echo "DB_PORT=${DB_PORT}" >> .env
+            echo "DB_NAME=${DB_NAME}" >> .env
+            echo "DB_USERNAME=${DB_USERNAME}" >> .env
+            echo "DB_PASSWORD=${DB_PASSWORD}" >> .env
+            echo "JWT_SECRET=${JWT_SECRET}" >> .env
+
             docker pull kimseokryul/frontend-app
             docker pull kimseokryul/backend-app
             docker-compose down
