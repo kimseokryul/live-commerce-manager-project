@@ -66,7 +66,8 @@ public interface UserDAO {
 	
 	// 계정 잠금 해제 상태 변경 (복수 회원 대상)
 	public int updateUnlockStatus(@Param("userIds") List<String> userIds, 
-	                              @Param("status") String status);
+	                              @Param("status") String status, 
+	                              @Param("login_fail_cnt") int login_fail_cnt);
 	
 	// 전체 회원 수 조회 (대시보드용)
 	public int countTotalMembers();

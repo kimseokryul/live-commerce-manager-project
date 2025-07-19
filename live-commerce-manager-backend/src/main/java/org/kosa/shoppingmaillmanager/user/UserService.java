@@ -222,6 +222,14 @@ public class UserService {
 	@Transactional
 	public boolean updateUser(User user) {
 		try {
+			// 기존 사용자 정보 조회
+	        User original = userDAO.getUser(user.getUser_id());
+	        
+	        // 잠금 해제 감지: 기존이 잠금(Y), 새 값이 해제(N)일 때
+	        if ("Y".equals(original.getStatus()) && "N".equals(user.getStatus())) {
+	        	log.info("잠금 해제 → 로그인 실패 횟수 초기화");
+	            user.setLogin_fail_cnt(0); // 실패 횟수 초기화
+	        }
 			userDAO.updateUser(user);
 			userDAO.updateHost(user);
 			return true;
@@ -242,7 +250,7 @@ public class UserService {
 	}
 
 	// 계정 잠금 해제 상태 변경
-	public int setUnlockStatus(List<String> userIds, String status) {
-		return userDAO.updateUnlockStatus(userIds, status);
+	public int setUnlockStatus(List<String> userIds, String status, int login_fail_cnt) {
+		return userDAO.updateUnlockStatus(userIds, status, login_fail_cnt);
 	}
 }

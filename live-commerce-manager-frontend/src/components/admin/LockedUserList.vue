@@ -183,7 +183,8 @@ const selectUnLock = async () => {
   try {
     const response = await axios.put("/api/admin/users/unlock", {
       userIds: selectedOrders.value,
-      status: 'Y'
+      status: 'Y',
+      login_fail_cnt: 0,
     });
 
     alert(response.data.message || "잠금 해제 완료!");

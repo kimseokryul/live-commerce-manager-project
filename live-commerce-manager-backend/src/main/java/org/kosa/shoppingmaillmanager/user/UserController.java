@@ -311,12 +311,13 @@ public class UserController {
 	public ResponseEntity<?> setUnlockStatus(@RequestBody Map<String, Object> body) {
 	    List<String> userIds = (List<String>) body.get("userIds");
 	    String status = (String) body.get("status");
+	    int login_fail_cnt = (int) body.get("login_fail_cnt");
 	    
 	    if (userIds == null || userIds.isEmpty() || status == null) {
 	        return ResponseEntity.badRequest().body("필수 정보 누락");
 	    }
 
-	    int updated = userService.setUnlockStatus(userIds, status);
+	    int updated = userService.setUnlockStatus(userIds, status, login_fail_cnt);
 	    return ResponseEntity.ok(Map.of("message", updated + "명 처리 완료", "status", status));
 	}
 }
