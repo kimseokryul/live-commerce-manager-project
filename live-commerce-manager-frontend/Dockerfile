@@ -11,7 +11,6 @@ RUN npm run build
 # 2단계: RTMP 모듈 포함 Nginx 사용
 FROM tiangolo/nginx-rtmp:latest AS production-stage
 
-# ✅ /opt/data/hls 및 /opt/data/hls/live 디렉토리 생성
 RUN mkdir -p /opt/data/hls/live
 
 # ✅ 설정파일 복사
