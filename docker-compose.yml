@@ -20,6 +20,7 @@ services:
     restart: always
     depends_on:
       - redis
+      - rtmp-server
 
   frontend:
     image: kimseokryul/frontend-app
@@ -35,3 +36,14 @@ services:
     container_name: redis
     ports:
       - "6379:6379"
+
+  rtmp-server:
+    build:
+      context: ./rtmp-server
+    container_name: rtmp-server
+    ports:
+      - "1935:1935"   # RTMP 수신 포트 (OBS용)
+      - "80:80"     # HLS 재생 포트 (프론트에서 m3u8 접근)
+    volumes:
+      - /opt/data/hls:/opt/data/hls  # hls 저장 폴더 공유
+    restart: always
