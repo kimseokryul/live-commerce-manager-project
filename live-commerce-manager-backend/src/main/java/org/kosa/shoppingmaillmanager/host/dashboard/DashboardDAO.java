@@ -52,6 +52,21 @@ public interface DashboardDAO {
 	List<SalesCategoryDTO> getDashboardCategorySales();
 
 	List<SalesHostDTO> getDashboardHostSales();
+
+	MonthlySalesSummaryDto getWholeSalesSummaryCard(@Param("month") String month);
+
+	List<SalesOrderItemDto> findWholeSalesOrderItems(
+	        @Param("startDate") String startDate,
+	        @Param("endDate") String endDate,
+	        @Param("productKeyword") String productKeyword,
+	        @Param("paymentMethodKeyword") String paymentMethodKeyword
+	    );
+
+	List<TopProductDto> getWholeTop5ByQuantity();
+
+	List<TopProductDto> getWholeTop5BySales();
+
+	Map<String, Integer> countWholePaymentMethodCounts();
 }
 
 

@@ -97,4 +97,25 @@ public class DashboardService {
 	public List<SalesHostDTO> getDashboardHostSales() {
 		return dashboardDAO.getDashboardHostSales();
 	}
+
+	public MonthlySalesSummaryDto getWholeSalesSummaryCard(String month) {
+		return dashboardDAO.getWholeSalesSummaryCard(month);
+	}
+
+	public List<SalesOrderItemDto> getWholeSalesOrderItems(String startDate, String endDate, String productKeyword,
+			String paymentMethodKeyword) {
+		return dashboardDAO.findWholeSalesOrderItems(startDate, endDate, productKeyword, paymentMethodKeyword);
+	}
+
+	public List<TopProductDto> getWholeTop5ProductsByQuantity() {
+		return dashboardDAO.getWholeTop5ByQuantity();
+	}
+
+	public List<TopProductDto> getWholeTop5ProductsBySales() {
+		return dashboardDAO.getWholeTop5BySales();
+	}
+
+	public Map<String, Integer> getWholePaymentMethodCounts() {
+		return dashboardDAO.countWholePaymentMethodCounts();
+	}
 }

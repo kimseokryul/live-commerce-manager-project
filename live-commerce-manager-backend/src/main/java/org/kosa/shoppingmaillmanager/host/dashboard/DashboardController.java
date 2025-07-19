@@ -101,6 +101,7 @@ public class DashboardController {
 	
 	
 	// ✅ 최근 30일 전체 일별 매출
+	@Operation(summary = "최근 30일 전체 일별 매출", description = "최근 30일 동안의 일별 전체 매출 요약을 조회합니다.")
 	@GetMapping("/admin/sales/daily")
 	public ResponseEntity<List<SalesSummaryDto>> getWholeDailySales() {
 		List<SalesSummaryDto> result = dashboardService.getWholeDailySalesSummary();
@@ -108,27 +109,72 @@ public class DashboardController {
 	}
 
 	// ✅ 최근 12개월 전체 월별 매출
+	@Operation(summary = "최근 12개월 전체 월별 매출", description = "최근 30일 동안의 월별 전체 매출 요약을 조회합니다.")
 	@GetMapping("/admin/sales/monthly")
 	public ResponseEntity<List<SalesSummaryDto>> getWholeMonthlySales() {
 		List<SalesSummaryDto> result = dashboardService.getWholeMonthlySalesSummary();
 		return ResponseEntity.ok(result);
 	}
 	
-
+	@Operation(summary = "KPI 카드 섹션", description = "금일 매출, 총 회원 수, 신규 회원 수, 총 주문 수, 처리 중 주문, 총 호스트 수를 조회합니다.")
     @GetMapping("/admin")
     public ResponseEntity<Map<String, Object>> getDashboardStats() {
         return ResponseEntity.ok(dashboardService.getDashboardStats());
     }
     
+	@Operation(summary = "카테고리별 매출 분포", description = "카테고리별 총 매출 수를 조회합니다")
     @GetMapping("/admin/sales/category")
     public ResponseEntity<List<SalesCategoryDTO>> getDashboardCategorySales() {
     	System.out.println(dashboardService.getDashboardCategorySales());
         return ResponseEntity.ok(dashboardService.getDashboardCategorySales());
     }
     
+	@Operation(summary = "호스트 매출 순위 Top 5", description = "호스트들 중 총 매출이 가장 높은 5명의 순위를 조회합니다.")
     @GetMapping("/admin/sales/host")
     public ResponseEntity<List<SalesHostDTO>> getDashboardHostSales() {
         return ResponseEntity.ok(dashboardService.getDashboardHostSales());
     }
+	
+	
+	@Operation(summary = "전체 매출 요약 카드", description = "특정 월 기준으로 전체 총 주문 수, 총 매출, 평균 결제 금액을 반환합니다.")
+	@GetMapping("/admin/sales/summary-card")
+	public MonthlySalesSummaryDto getWholeSalesSummaryCard(@RequestParam String month, HttpServletRequest request) {
+		return dashboardService.getWholeSalesSummaryCard(month);
+	}
+	
+	
+	@Operation(summary = "전체 매출 상세 주문 항목 조회", description = "날짜, 상품명, 결제수단으로 필터링한 전체 주문 항목 리스트를 조회합니다.")
+	@GetMapping("/admin/sales/order-items")
+	public ResponseEntity<List<SalesOrderItemDto>> getWholeSalesOrderItems(HttpServletRequest request,
+			@RequestParam(required = false) String startDate, @RequestParam(required = false) String endDate,
+			@RequestParam(required = false) String productKeyword,
+			@RequestParam(required = false) String paymentMethodKeyword) {
+		List<SalesOrderItemDto> items = dashboardService.getWholeSalesOrderItems(startDate, endDate, productKeyword,
+				paymentMethodKeyword);
+		return ResponseEntity.ok(items);
+	}
+	
+	@Operation(summary = "TOP5 상품 (전체 판매 수량 기준)", description = "전체 판매 수량 기준 상위 5개 상품을 조회합니다.")
+	@GetMapping("/admin/sales/top-products/quantity")
+	public ResponseEntity<List<TopProductDto>> getWholeTopProductsByQuantity() {
+		List<TopProductDto> topProducts = dashboardService.getWholeTop5ProductsByQuantity();
+		return ResponseEntity.ok(topProducts);
+	}
+
+	@Operation(summary = "TOP5 상품 (전체 매출 금액 기준)", description = "전체 매출 금액 기준 상위 5개 상품을 조회합니다.")
+	@GetMapping("/admin/sales/top-products/sales")
+	public ResponseEntity<List<TopProductDto>> getWholeTopProductsBySales() {
+		List<TopProductDto> topProducts = dashboardService.getWholeTop5ProductsBySales();
+		return ResponseEntity.ok(topProducts);
+	}
+	
+	@Operation(summary = "결제 수단별 전체 매출 비율", description = "카드, 휴대폰, 페이 등 결제 수단별 전체 매출 비율을 반환합니다.")
+	@GetMapping("/admin/payment-method-chart")
+	public ResponseEntity<?> getPaymentMethodChart() {
+
+		Map<String, Integer> result = dashboardService.getWholePaymentMethodCounts();
+		return ResponseEntity.ok(result);
+	}
+	
    
 }

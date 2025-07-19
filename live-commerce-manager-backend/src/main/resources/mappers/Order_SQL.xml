@@ -417,4 +417,5 @@
 	  FROM tb_order
 	  WHERE DATE(order_date) = CURRENT_DATE
 	</select>
+	
 </mapper>

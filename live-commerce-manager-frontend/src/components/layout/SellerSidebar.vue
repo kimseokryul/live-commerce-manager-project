@@ -32,8 +32,8 @@
               <li><router-link :to="{ path: '/admin/user-list/host', query: { filterType: 'host' } }" class="submenu-link">호스트 관리</router-link></li>
             </ul>
           </li>
-          <!-- <li><router-link to="/admin/sellerSales" class="sidebar-link"><span class="menu-icon">📊</span>매출 현황</router-link></li>
-          <li><router-link to="/admin/board" class="sidebar-link"><span class="menu-icon">📋</span>게시판 관리</router-link></li> -->
+          <li><router-link to="/admin/sellerSales" class="sidebar-link"><span class="menu-icon">📊</span>매출 현황</router-link></li>
+          <!-- <li><router-link to="/admin/board" class="sidebar-link"><span class="menu-icon">📋</span>게시판 관리</router-link></li> -->
         </template>
 
         <!-- 🟦 호스트 전용 메뉴 -->

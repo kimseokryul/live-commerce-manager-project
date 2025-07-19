@@ -164,15 +164,18 @@
 </template>
 
 <script setup>
-
 import { onMounted, reactive, ref } from 'vue'
 import axios from 'axios'
 import qs from 'qs'
 import { useRoute } from 'vue-router'
 
+// 현재 URL 쿼리에서 order_id를 추출하기 위한 라우터 객체
 const route = useRoute()
+
+// 주문 상품 리스트
 const items = ref([])
 
+// 주문 상세 정보 객체 (양방향 바인딩용)
 const getOrderDetail = reactive({
   order_id: '',
   user_id: '',
@@ -201,10 +204,10 @@ const getOrderDetail = reactive({
     item_total_price: '',
     item_delivery_fee: '',
     item_point_earned: '',
-    },
-  ]
+  }]
 })
 
+// 상태 문자열에 따라 CSS 클래스를 반환하는 함수
 const getStatusClass = (status) => {
   switch (status) {
     case '결제완료':
@@ -222,20 +225,20 @@ const getStatusClass = (status) => {
   }
 }
 
+// 주문 상세 정보 조회 함수
 const getOrders = async () => {
-  try{
+  try {
     const response = await axios.get('/api/order/detail', {
-    params: {
-      order_id: getOrderDetail.order_id,
-      
-    },
-    // get방식으로 배열을 보내기 위해
-    // 배열 파라미터를 ?key=val1&key=val2 형태로 직렬화함
-    // paramsSerializer: params => qs.stringify(params, { arrayFormat: 'repeat' })
-  })
+      params: {
+        order_id: getOrderDetail.order_id,  // 현재 쿼리에서 설정한 order_id 사용
+      },
+      // 배열이 포함된다면 아래 직렬화 옵션 사용 (현재 주석 처리됨)
+      // paramsSerializer: params => qs.stringify(params, { arrayFormat: 'repeat' })
+    })
+
     const data = response.data
 
-   // 주문 기본 정보 세팅
+    // 주문 기본 정보 매핑
     getOrderDetail.user_id = data.user_id
     getOrderDetail.order_date = data.order_date
     getOrderDetail.user_name = data.user_name
@@ -255,18 +258,20 @@ const getOrders = async () => {
     getOrderDetail.final_payment_amount = data.final_payment_amount
     getOrderDetail.total_quantity = data.total_quantity
 
-    // 주문 상품 목록 세팅
+    // 주문 상품 리스트 세팅
     items.value = data.orderItems
+
   } catch (error) {
     console.error('데이터를 불러오는데 실패하였습니다.', error)
     alert('데이터를 불러오는데 실패하였습니다.')
   }
 }
 
+// 주문 수정(배송정보 등) 저장 함수
 const putOrders = async () => {
   console.log("버튼 클릭됨")
-  try{
-   await axios.put('/api/order/detail', {
+  try {
+    await axios.put('/api/order/detail', {
       order_id: getOrderDetail.order_id,
       recipient_name: getOrderDetail.recipient_name,
       recipient_phone: getOrderDetail.recipient_phone,
@@ -274,15 +279,15 @@ const putOrders = async () => {
       order_address_detail: getOrderDetail.order_address_detail,
       delivery_memo: getOrderDetail.delivery_memo,
       order_memo: getOrderDetail.order_memo
-  })
-  alert('수정 완료')
-  }catch (error) {
+    })
+    alert('수정 완료')
+  } catch (error) {
     console.error('데이터를 수정하는데 실패하였습니다.', error)
     alert('데이터를 수정하는데 실패하였습니다.')
   }
 }
 
-
+// 주문 강제 취소 처리 함수 (관리자 전용)
 const cancelOrder = async (order_id) => {
   try {
     await axios.delete(`/api/order/${order_id}`)
@@ -293,12 +298,15 @@ const cancelOrder = async (order_id) => {
   }
 }
 
+// 다음 우편번호 API 스크립트를 동적으로 불러오는 함수
 const loadDaumPostcodeScript = () => {
   return new Promise((resolve, reject) => {
+    // 이미 스크립트가 로드되어 있는 경우
     if (window.daum && window.daum.Postcode) {
       resolve()
       return
     }
+    // 스크립트가 없으면 추가
     const script = document.createElement('script')
     script.src = '//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js'
     script.onload = resolve
@@ -307,25 +315,31 @@ const loadDaumPostcodeScript = () => {
   })
 }
 
+// 주소 검색창 열기 (다음 우편번호 서비스)
 const searchAddress = async () => {
   await loadDaumPostcodeScript()
   new window.daum.Postcode({
     oncomplete: function (data) {
+      // 주소 선택 완료 시, 우편번호와 도로명 주소를 입력 필드에 세팅
       getOrderDetail.order_zipcode = data.zonecode
       getOrderDetail.order_address_detail = data.roadAddress || data.jibunAddress
     }
   }).open()
 }
 
+// 이미지 URL 전체 경로 생성 함수
 function getFullImageUrl(path) {
-  return `http://localhost:8080${path}`;  // 백엔드 주소에 맞게 변경!
+  return `http://localhost:8080${path}` // 서버 주소와 맞게 조정 필요
 }
 
+// 페이지가 마운트될 때 실행되는 초기 함수
 onMounted(() => {
+  // 쿼리에서 전달된 order_id 값을 세팅
   getOrderDetail.order_id = route.query.order_id
+
+  // 주문 상세 데이터 조회
   getOrders()
 })
-
 </script>
 
 <style scoped src="@/assets/order/orderDetail.css"></style>

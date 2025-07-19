@@ -24,12 +24,18 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+@Tag(
+		  name = "관리자/호스트 인증 및 계정 API",
+		  description = "로그인, 토큰 갱신, 회원가입, 계정 정보 조회 및 수정 등의 기능을 제공합니다."
+		)
 @RestController
 @RequiredArgsConstructor
 @Slf4j
@@ -40,29 +46,10 @@ public class UserController {
 	private final BCryptPasswordEncoder passwordEncoder;
 	private final RefreshTokenService refreshTokenService;
 	
-//	@PostMapping("/login")
-//	public ResponseEntity<?> login(@RequestBody User user) {
-//	    try {
-//	        User dbUser = userService.login(user.getUser_id(), user.getPassword());
-//	        String token = jwtUtil.generateToken(dbUser.getUser_id());
-//
-//	        // DTO 변환
-//	        LoginUserDTO dto = new LoginUserDTO(dbUser);
-//
-//	        return ResponseEntity.ok(Map.of(
-//	            "token", token,
-//	            "user", dto
-//	        ));
-//
-//	    } catch (IllegalArgumentException e) {
-//	        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-//	                .body(Map.of("error", e.getMessage()));
-//	    } catch (RuntimeException e) {
-//	        return ResponseEntity.status(HttpStatus.FORBIDDEN)
-//	                .body(Map.of("error", e.getMessage()));
-//	    }
-//	}
-	
+	@Operation(
+			  summary = "사용자 로그인",
+			  description = "입력한 아이디와 비밀번호를 통해 로그인합니다. 로그인 성공 시 AccessToken과 사용자 정보를 반환하며, RefreshToken은 HttpOnly 쿠키로 저장됩니다."
+			)
 	@PostMapping("/login")
 	public ResponseEntity<?> login(@RequestBody User user, HttpServletResponse response) {
 		System.out.println("✅ 받은 user_id = " + user.getUser_id());
@@ -121,52 +108,54 @@ public class UserController {
 	
 	
 	// 토큰 값 새로 가져오기
-	@PostMapping("/refresh") // [POST] 방식의 /refresh 엔드포인트
-	public ResponseEntity<?> refreshToken(HttpServletRequest request, HttpServletResponse response) {
-	    
-	    // 1. 요청의 쿠키에서 "refreshToken"이라는 이름의 쿠키 값을 찾음
-	    String refreshToken = null;
-	    for (Cookie cookie : request.getCookies()) {
-	        if ("refreshToken".equals(cookie.getName())) {
-	            refreshToken = cookie.getValue(); //  쿠키에서 추출한 리프레시 토큰 값
-	            break;
-	        }
-	    }
-
-	    // 2. 쿠키에 refreshToken이 없거나, 토큰 자체가 위조되었거나 만료되었을 경우 → 401 반환
-	    if (refreshToken == null || !jwtUtil.validateToken(refreshToken)) {
-	        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-	                             .body("리프레시 토큰이 유효하지 않음");
-	    }
-
-	    // 3. 리프레시 토큰에서 사용자 ID(subject)를 꺼냄
-	    //     JWT 안에 들어있는 사용자 식별자 (setSubject로 넣은 값)
-	    String userId = jwtUtil.validateTokenAndGetUserId(refreshToken);
-
-	    //  4. 서버에 저장된 리프레시 토큰과 비교 (토큰 탈취 방지 목적)
-	    //     클라이언트가 보내준 토큰이 서버가 기억하고 있는 값과 다르면 → 위조된 토큰으로 판단
-	    if (!refreshTokenService.isValid(userId, refreshToken)) {
-	        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-	                             .body("리프레시 토큰이 일치하지 않음");
-	    }
-
-	    // 5. 모든 검증을 통과하면 새로운 Access Token을 발급 (유효기간: 1시간)
-	    String newAccessToken = jwtUtil.generateToken(userId);
-	    Date expireAt = jwtUtil.getTokenExpiration(newAccessToken);
-
-	    // 6. 새로 발급한 Access Token을 응답 바디에 담아서 클라이언트에 전달
-	    return ResponseEntity.ok(Map.of(
-	    		"accessToken", newAccessToken,
-	    		"expireTime", expireAt.getTime() / 1000
-	    ));
-	}
+//	 @Operation(summary = "AccessToken 재발급", description = "Refresh Token을 통해 Access Token을 재발급합니다.")
+//	@PostMapping("/refresh") // [POST] 방식의 /refresh 엔드포인트
+//	public ResponseEntity<?> refreshToken(HttpServletRequest request, HttpServletResponse response) {
+//	    
+//	    // 1. 요청의 쿠키에서 "refreshToken"이라는 이름의 쿠키 값을 찾음
+//	    String refreshToken = null;
+//	    for (Cookie cookie : request.getCookies()) {
+//	        if ("refreshToken".equals(cookie.getName())) {
+//	            refreshToken = cookie.getValue(); //  쿠키에서 추출한 리프레시 토큰 값
+//	            break;
+//	        }
+//	    }
+//
+//	    // 2. 쿠키에 refreshToken이 없거나, 토큰 자체가 위조되었거나 만료되었을 경우 → 401 반환
+//	    if (refreshToken == null || !jwtUtil.validateToken(refreshToken)) {
+//	        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+//	                             .body("리프레시 토큰이 유효하지 않음");
+//	    }
+//
+//	    // 3. 리프레시 토큰에서 사용자 ID(subject)를 꺼냄
+//	    //     JWT 안에 들어있는 사용자 식별자 (setSubject로 넣은 값)
+//	    String userId = jwtUtil.validateTokenAndGetUserId(refreshToken);
+//
+//	    //  4. 서버에 저장된 리프레시 토큰과 비교 (토큰 탈취 방지 목적)
+//	    //     클라이언트가 보내준 토큰이 서버가 기억하고 있는 값과 다르면 → 위조된 토큰으로 판단
+//	    if (!refreshTokenService.isValid(userId, refreshToken)) {
+//	        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+//	                             .body("리프레시 토큰이 일치하지 않음");
+//	    }
+//
+//	    // 5. 모든 검증을 통과하면 새로운 Access Token을 발급 (유효기간: 1시간)
+//	    String newAccessToken = jwtUtil.generateToken(userId);
+//	    Date expireAt = jwtUtil.getTokenExpiration(newAccessToken);
+//
+//	    // 6. 새로 발급한 Access Token을 응답 바디에 담아서 클라이언트에 전달
+//	    return ResponseEntity.ok(Map.of(
+//	    		"accessToken", newAccessToken,
+//	    		"expireTime", expireAt.getTime() / 1000
+//	    ));
+//	}
 	
+	@Operation(summary = "로그아웃", description = "로그아웃 처리 (서버 측 세션 처리 필요 시 확장 가능)")
 	@PostMapping("/logout")
 	public ResponseEntity<String> logout() {
 	    return ResponseEntity.ok("로그아웃 되었습니다");
 	}
 	
-	
+	@Operation(summary = "아이디 찾기", description = "이름과 이메일을 통해 가입된 아이디(들)를 찾습니다.")
 	@GetMapping("/login/findId")
 	public ResponseEntity<?> findId(@RequestParam String name,
 		    @RequestParam String email) {
@@ -182,6 +171,7 @@ public class UserController {
 	    }
 	}
 	
+	@Operation(summary = "비밀번호 찾기", description = "아이디와 이메일을 통해 비밀번호 재설정 가능 여부 확인")
 	@GetMapping("/login/findPassword")
 	public ResponseEntity<?> findPassword(@RequestParam String user_id,
 		    @RequestParam String email) {
@@ -194,6 +184,7 @@ public class UserController {
 	    }
 	}
 	
+	@Operation(summary = "비밀번호 변경", description = "비밀번호 재설정 시 사용")
 	@PutMapping("/login/changePassword")
 	public ResponseEntity<?> changePassword(@RequestBody Map<String, String> payload) {
 	    String userId = payload.get("user_id");
@@ -204,12 +195,13 @@ public class UserController {
 	    return ResponseEntity.ok().build();
 	}
 	
+	@Operation(summary = "호스트 회원가입", description = "호스트 계정 회원가입 처리")
 	@PostMapping("/host/register")
 	@ResponseBody
 	public Map<String, Object> register(@RequestBody User user){
 		Map<String, Object> result = new HashMap<String, Object>();
-		if(!userService.isValid(user)) {
-			result.put("errorMessage", "입력값 검증 오류 발생");
+		if(userService.validateUser(user) != null) {
+			result.put("errorMessage", userService.validateUser(user));
 			result.put("status", "error");
 		} else {
 			userService.registerHost(user);
@@ -218,6 +210,7 @@ public class UserController {
 		return result;
 	}
 	
+	@Operation(summary = "아이디 중복 확인", description = "입력된 아이디가 이미 존재하는지 확인")
 	@PostMapping("/host/isExistUserId")
 	public Map<String, Object> isExistUserId(@RequestBody User user){
 		Map<String, Object> map = new HashMap<String, Object>();
@@ -225,6 +218,7 @@ public class UserController {
 		return map;
 	}
 	
+	@Operation(summary = "내 정보 조회 (호스트)", description = "호스트 사용자 자신의 user_id 조회 (JWT 기반)")
 	@GetMapping("/host/me")
 	public ResponseEntity<?> getMyInfo() {
 		String user_id = (String) SecurityContextHolder.getContext()
@@ -233,6 +227,7 @@ public class UserController {
 		return ResponseEntity.ok(Map.of("user_id", user_id));
 	}
 	
+	@Operation(summary = "내 정보 조회 (공통)", description = "로그인된 사용자의 정보 조회 (user_id, grade_id, nickname)")
 	@GetMapping("/login/me")
 	public ResponseEntity<?> getMe(){
 		String userId = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -251,7 +246,7 @@ public class UserController {
 	    ));
 	}
 	
-	
+	@Operation(summary = "회원 목록 조회 (관리자)", description = "관리자가 전체 회원을 페이지네이션 방식으로 조회")
 	@GetMapping("/admin/user-list")
 	public ResponseEntity<PageResponseVO<UserListDTO>> userList(@ModelAttribute UserListDTO dto){
 		dto.applyFilterType();
@@ -259,6 +254,7 @@ public class UserController {
         return ResponseEntity.ok(pageResponse);
 	}
 	
+	@Operation(summary = "회원 상세 조회", description = "회원 ID로 상세 정보 조회")
 	@GetMapping("/user-detail/{user_id}")
 	public ResponseEntity<User> userDetail(@PathVariable String user_id){
 		User user = userService.getUser(user_id);
@@ -270,6 +266,7 @@ public class UserController {
 	    return ResponseEntity.ok(user); // 200 + JSON 바디
 	}
 	
+	@Operation(summary = "회원 정보 수정", description = "회원 상세 정보 수정")
 	@PutMapping("/user-detail")
 	public ResponseEntity<String> updateUserDetail(@RequestBody User user) {
 	    boolean success = userService.updateUser(user);
@@ -281,6 +278,7 @@ public class UserController {
 	    }
 	}
 	
+	@Operation(summary = "회원 탈퇴 처리", description = "관리자가 회원의 탈퇴 여부(secession_yn)를 설정")
 	@PutMapping("/admin/user/secession/{user_id}")
 	public ResponseEntity<String> secessionUser(
 			@PathVariable String user_id, 
@@ -294,6 +292,7 @@ public class UserController {
 	    }
 	}
 	
+	@Operation(summary = "블랙리스트 설정", description = "선택된 유저들을 블랙리스트로 설정 또는 해제")
 	@PutMapping("/admin/users/blacklist")
 	public ResponseEntity<?> setBlacklistStatus(@RequestBody Map<String, Object> body) {
 	    List<String> userIds = (List<String>) body.get("userIds");
@@ -307,11 +306,12 @@ public class UserController {
 	    return ResponseEntity.ok(Map.of("message", updated + "명 처리 완료", "status", blacklisted));
 	}
 	
+	@Operation(summary = "계정 잠금 해제", description = "선택된 유저들의 잠금 상태 해제")
 	@PutMapping("/admin/users/unlock")
 	public ResponseEntity<?> setUnlockStatus(@RequestBody Map<String, Object> body) {
 	    List<String> userIds = (List<String>) body.get("userIds");
 	    String status = (String) body.get("status");
-
+	    
 	    if (userIds == null || userIds.isEmpty() || status == null) {
 	        return ResponseEntity.badRequest().body("필수 정보 누락");
 	    }

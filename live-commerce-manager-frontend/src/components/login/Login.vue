@@ -3,21 +3,20 @@
     <div class="login-box">
       
       <div class="login-header">
-        <!-- ✅ 로고 추가 -->
+        <!-- 로고 추가 -->
         <img src="/src/assets/TriMarketAdmin-black.png" alt="TriMarket 로고" class="logo-img" />
-        <!-- <div class="avatar">
-          <svg xmlns="http://www.w3.org/2000/svg" class="avatar-icon" viewBox="0 0 16 16" fill="currentColor">
-            <path d="M8 9a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/>
-            <path fill-rule="evenodd" d="M14 13s-1-1.5-6-1.5S2 13 2 13v1h12v-1z"/>
-          </svg>
-        </div> -->
-        <!-- <h2>LOGIN</h2> -->
       </div>
 
+      <!-- 로그인 -->
       <form @submit.prevent="handleLogin">
         <input v-model="user_id" type="text" placeholder="아이디를 입력하세요" required />
         <input v-model="password" type="password" placeholder="비밀번호를 입력하세요" required />
 
+        <!-- 
+          로그인 상태 유지 
+          * 체크 시 : 로컬스토리지 (창 닫을 시 로그인 유지)에 토큰 저장
+          * 체크 해제 시 : 세션스토리지 (창 닫을시 로그인 해제)에 토큰 저장 
+        -->
         <div class="options">
           <label><input type="checkbox" v-model="rememberMe" /> 로그인 상태 유지</label>
         </div>
@@ -27,13 +26,16 @@
         </div>
 
         <div class="option">
+          <!-- 아이디 찾기 -->
           <router-link to="/login/findId">아이디 찾기</router-link>
           <b> | </b>
+          <!-- 비밀번호 찾기 -->
           <router-link to="/login/findPassword">비밀번호 찾기</router-link>
         </div>
 
         <p class="footer-text">
           당신도 호스트가 되고 싶나요?
+          <!-- 회원가입 -->
           <router-link to="/host/register">호스트 가입</router-link>
         </p>
       </form>
@@ -52,186 +54,83 @@ const password = ref('')
 const rememberMe = ref(false)
 const router = useRouter()
 
+// 로그인 로직
 const handleLogin = async () => {
   try {
+    // 1. 백엔드 컨트롤러의 /login으로 로그인 정보 전송 (user_id, password)
     const response = await axios.post('/api/login', {
       user_id: user_id.value,
       password: password.value,
     }, {
-    withCredentials: true,
-    headers: {
-      'Content-Type': 'application/json'   // 이거 안 넣으면 백엔드는 @RequestBody 못 받음
-    }
-  })
+      withCredentials: true, // 쿠키 전송 시 필요 (CSRF 보호나 세션 인증 시 사용 가능)
+      headers: {
+        'Content-Type': 'application/json'  // 이거 안 넣으면 백엔드는 @RequestBody 못 받음
+      }
+    })
 
+    // 2. 백엔드에서 JWT 토큰 발급받음
     const token = response.data.token
+
+    // 3. 로그인 상태 유지 여부에 따라 저장소 선택
     if (rememberMe.value) {
+      // 체크된 경우 → localStorage에 저장 (브라우저 꺼도 유지됨)
       localStorage.setItem('jwt', token)
       localStorage.setItem('rememberMe', 'true')
     } else {
+      // 체크 해제된 경우 → sessionStorage에 저장 (브라우저 종료 시 사라짐)
       sessionStorage.setItem('jwt', token)
       localStorage.removeItem('rememberMe')
     }
 
-    const gradeRes = await axios.get('/api/login/me', { authorization: `Bearer ${token}` })
-    if (gradeRes.data.grade_id==='ADMIN'){
+    // 4. 로그인한 회원의 정보 조회 (토큰 인증 필요)
+    const gradeRes = await axios.get('/api/login/me', {
+      headers: {
+        Authorization: `Bearer ${token}`  // ✅ 이거 안 넣으면 401 뜸
+      }
+    })
+
+    // 5. 등급에 따라 라우팅 분기
+    if (gradeRes.data.grade_id === 'ADMIN') {
+      // 관리자 등급 → 관리자 페이지로 이동
       router.push('/admin')
-    }
-    else{
+    } else {
+      // 호스트 등급 또는 기타 → 기본 홈으로 이동
       router.push('/')
     }
+
   } catch (error) {
+    // 에러 응답 메시지 출력 (백엔드에서 내려준 메시지 우선)
     alert(error.response?.data?.error || '로그인 실패')
     console.error(error)
   }
 }
 
-// Axios 요청마다 Authorization 자동 설정
+// Axios 요청마다 Authorization 헤더 자동 설정 (로그인 유지용)
 onMounted(() => {
-  // 중복 등록 방지
+  // 1. 기존 인터셉터가 없을 때만 등록 (중복 요청 방지)
   if (!axios.interceptors.request.handlers.length) {
     axios.interceptors.request.use(config => {
-      // 1. rememberMe 체크
+
+      // 2. '로그인 상태 유지' 여부 확인
       const remember = localStorage.getItem('rememberMe') === 'true'
 
-      // 2. remember 값에 따라 token 위치 선택
+      // 3. remember 값에 따라 토큰 위치 선택
+      // - true: localStorage (브라우저 종료해도 유지)
+      // - false: sessionStorage (브라우저 종료 시 삭제됨)
       const token = remember
         ? localStorage.getItem('jwt')       // rememberMe면 localStorage
         : sessionStorage.getItem('jwt')     // 아니면 sessionStorage
 
-      // 3. 토큰이 존재하면 요청 헤더에 Authorization 추가
+      // 4. 토큰이 있으면 Authorization 헤더에 추가
       if (token) {
         config.headers.Authorization = `Bearer ${token}`
       }
 
+      // 5. 변경된 config 반환
       return config
     })
   }
 })
 </script>
 
-<style scoped>
-.login-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  background: #f4f6f9;
-}
-
-.login-box {
-  width: 450px;
-  background: white;
-  border: 1px solid #ddd;
-  padding: 2rem;
-  border-radius: 6px;
-  box-shadow: 0 0 8px rgba(0, 0, 0, 0.05);
-  text-align: center;
-}
-
-.login-header .avatar {
-  font-size: 48px;
-  color: #3b5998;
-  margin-bottom: 0.5rem;
-}
-
-.login-header .avatar-icon {
-  width: 48px;
-  height: 48px;
-}
-
-.login-header h2 {
-  margin-bottom: 1.5rem;
-  color: #333;
-  font-weight: 500;
-}
-
-form input[type="text"],
-form input[type="password"] {
-  width: 100%;
-  padding: 10px 12px;
-  margin-bottom: 1rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  font-size: 14px;
-  box-sizing: border-box; 
-  background-color: #fff;
-}
-
-/* form input[type="text"],
-form input[type="password"],
-form button{
-  width: 100%;
-  padding: 10px 12px;
-  margin-bottom: 1rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  font-size: 14px;
-  box-sizing: border-box;
-} */
-
-/*form input[type="text"],
-form input[type="password"],
-form button {
-  width: 100%;
-  box-sizing: border-box;
-} */
-
-form .options {
-  display: flex;
-  justify-content: space-between;
-  /* justify-content: center; */
-  align-items: center;
-  font-size: 13px;
-  margin-bottom: 1rem;
-}
-
-form .options b {
-  justify-content: center;
-  text-decoration: none;
-  color: #3b5998;
-}
-
-form button {
-  /* all: unset; ❌ 빼버리고 아래처럼 직접 초기화 */
-  appearance: none;
-  border: none;
-  outline: none;
-  background: none;
-
-  display: block;
-  width: 100%;
-  box-sizing: border-box; /* ✅ 이거 꼭 넣어 */
-  background-color: #3b5998;
-  color: white;
-  padding: 10px;
-  border-radius: 4px;
-  font-size: 15px;
-  text-align: center;
-  cursor: pointer;
-  margin-bottom: 1rem;
-}
-
-form button:hover {
-  background-color: #2d4373;
-}
-
-.footer-text {
-  margin-top: 1rem;
-  font-size: 13px;
-}
-
-.footer-text a {
-  color: #3b5998;
-  text-decoration: none;
-  font-weight: 500;
-}
-
-.logo-img {
-  width: 300px;
-  height: auto;
-  margin-bottom: 1.5rem;
-  object-fit: contain;
-}
-</style>
-<!-- 안녕 -->
+<style scoped src="@/assets/login/login.css"></style>

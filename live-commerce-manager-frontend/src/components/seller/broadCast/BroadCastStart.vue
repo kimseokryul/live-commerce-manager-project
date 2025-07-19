@@ -1,32 +1,38 @@
 <template>
   <div class="broadcast-page">
-    <!-- 전체를 좌우 섹션으로 나눔 -->
+    <!-- 전체 페이지 좌우 섹션 구성 -->
     <div class="main-content">
-      <!-- 왼쪽: 방송 영상, 정보, 시작/중지/일시정지 버튼 -->
+      
+      <!-- 왼쪽: 영상, 정보, 제어버튼, OBS 설정 정보 -->
       <div class="left-section">
+        <!-- 방송 영상 플레이어 영역 -->
         <div class="video-section">
-          <!-- <video id="broadcastVideo" autoplay muted controls></video> -->
-          <video ref="videoRef" controls autoplay muted ></video>
+          <!-- HLS.js가 붙는 video 태그 -->
+          <video ref="videoRef" controls autoplay muted></video>
         </div>
 
+        <!-- 방송 정보 표시 -->
         <div class="info-section">
           <h2>{{ broadcast.title }}</h2>
           <p>방송자: {{ broadcast.broadcaster_id }}</p>
           <p>{{ broadcast.description }}</p>
         </div>
 
+        <!-- 방송 시작/중지 버튼 -->
         <div class="control-buttons">
           <button @click="startBroadcast">방송 시작</button>
           <button @click="stopBroadcast">방송 중지</button>
         </div>
 
+        <!-- RTMP 서버 주소 안내 -->
         <div class="form-group">
-          <label>OBS 서버 주소 설정 (파일>설정>방송 : 서버 주소에 해당 주소를 붙여넣어 주세요)</label>
-          <input type="text" :value="rtmp_url" readonly placeholder="자동 생성 예정" />
+          <label>OBS 서버 주소 설정</label>
+          <input type="text" :value="rtmp_url" readonly />
         </div>
 
+        <!-- 스트림 키 안내 + 보기/복사 -->
         <div class="form-group">
-          <label>OBS 스트림 키 (파일>설정>방송 : 스트림 키에 해당 주소를 붙여넣어 주세요)</label>
+          <label>OBS 스트림 키</label>
           <div style="display: flex; align-items: center;">
             <input
               ref="streamKeyInput"
@@ -46,25 +52,25 @@
         </div>
       </div>
 
-      <!-- 오른쪽: 시청자, 상품, 채팅, 송출/종료/나가기 버튼 -->
+      <!-- 오른쪽: 상품 목록, 채팅, 제어 버튼 -->
       <div class="right-section">
 
+        <!-- 시청자 수 뱃지 -->
         <div class="viewer-info">
           <div class="viewer-count-badge">
-            <svg xmlns="http://www.w3.org/2000/svg" class="viewer-icon" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12 5c-7 0-10 7-10 7s3 7 10 7 10-7 10-7-3-7-10-7zm0 12a5 5 0 110-10 5 5 0 010 10z"/>
-              <circle cx="12" cy="12" r="2.5" fill="#fff"/>
-            </svg>
+            <svg class="viewer-icon">...</svg>
             <span class="viewer-count">{{ broadcast.current_viewers }}명 시청 중</span>
           </div>
         </div>
 
+        <!-- 상품 목록 -->
         <div class="product-list">
           <div class="product-header" @click="toggleProductList">
             <h3>상품 목록</h3>
             <button class="toggle-button">{{ showProducts ? '접기 ▲' : '펼치기 ▼' }}</button>
           </div>
 
+          <!-- 펼쳤을 때 상품 테이블 표시 -->
           <table v-if="showProducts" class="product-table">
             <thead>
               <tr>
@@ -83,14 +89,12 @@
           </table>
         </div>
 
-        
-
-        <!-- ✅ 전체 chat-content를 통째로 접었다 폈다 -->
+        <!-- 실시간 채팅창 -->
         <div :class="['chat-box', { collapsed: isCollapsed }]" v-if="broadcast.broadcast_id">
           <SellerChat :broadcastId="String(broadcast.broadcast_id)" />
         </div>
 
-        <!-- 오른쪽 버튼 -->
+        <!-- 방송 제어 버튼 -->
         <div class="right-buttons">
           <div class="horizontal-buttons">
             <button @click="sendToBroadcast">방송 송출</button>
@@ -101,19 +105,19 @@
       </div>
     </div>
   </div>
-
 </template>
 
+
 <script setup>
+// Vue의 Composition API 관련 기능 및 외부 라이브러리 import
 import { onMounted, reactive, ref } from 'vue'
 import OBSWebSocket from 'obs-websocket-js'
 import { useRoute, useRouter } from 'vue-router'
 import axios from 'axios'
 import Hls from 'hls.js'
-import SellerChat from '@/components/chat/SellerChat.vue';
+import SellerChat from '@/components/chat/SellerChat.vue'
 
-// const obs = new OBSWebSocket()
-
+// 방송 정보를 저장하는 reactive 객체 (broadcast_id, 제목, 설명 등)
 const broadcast = reactive({
   broadcast_id: '',
   broadcaster_id: '',
@@ -122,31 +126,34 @@ const broadcast = reactive({
   current_viewers: '',
   like_count: '',
   scheduled_start_time: '',
-	scheduled_end_time: '',
-  productList: [],
-  viewerList: [],
+  scheduled_end_time: '',
+  productList: [],       // 방송 중 연결된 상품 목록
+  viewerList: []         // 시청자 목록
 })
-const isCollapsed = ref(false);
-const stream_key = ref('')
-const rtmp_url = ref('')
-const stream_url = ref('')
 
-const showProducts = ref(true)
-const showStreamKey = ref(false)
-const streamKeyInput = ref(null)
+// 상태 관리용 ref 변수들
+const isCollapsed = ref(false) // 채팅 박스 접기 여부
+const stream_key = ref('')     // 스트림 키
+const rtmp_url = ref('')       // RTMP 서버 주소
+const stream_url = ref('')     // HLS 스트리밍 URL
+const showProducts = ref(true) // 상품 목록 표시 여부
+const showStreamKey = ref(false) // 스트림 키 노출 여부
+const streamKeyInput = ref(null) // 스트림 키 input 태그 참조
+const videoRef = ref(null)       // video 태그 참조
 
-
+// 라우터 및 현재 URL 정보
 const router = useRouter()
 const route = useRoute()
 
+// 로그인 시 저장된 JWT 토큰 가져오기
 const token = ref(localStorage.getItem('jwt') || sessionStorage.getItem('jwt'))
 
-const videoRef = ref(null)
-
+// 상품 목록 토글 함수
 const toggleProductList = () => {
   showProducts.value = !showProducts.value
 }
 
+// 방송 상세 정보 조회 및 스트림 정보 설정
 const getBroadCasts = async () => {
   if (!broadcast.broadcast_id) {
     console.warn("⛔ broadcast_id가 없습니다:", broadcast.broadcast_id)
@@ -175,6 +182,7 @@ const getBroadCasts = async () => {
   }
 }
 
+// 스트리밍 URL을 기반으로 HLS.js를 사용한 영상 재생 함수
 const playStream = () => {
   const hlsUrl = stream_url.value
   console.log(stream_url.value)
@@ -192,6 +200,7 @@ const playStream = () => {
   }
 }
 
+// 방송 시작 요청
 const startBroadcast = async () => {
   console.log("✅ 요청 전에 broadcast_id 확인:", broadcast.broadcast_id);
   console.log("✅ 요청 전에 token 확인:", token);
@@ -225,6 +234,7 @@ const startBroadcast = async () => {
   }
 };
 
+// 방송 시작 요청
 const stopBroadcast = async () => {
   try {
     const res = await axios.post(`/api/broadcast/stop`, {
@@ -255,6 +265,7 @@ const stopBroadcast = async () => {
   }
 };
 
+// OBS 설정 이후 실제 송출 시작 요청 (방송 상태를 LIVE로 변경)
 const sendToBroadcast = async () => {
   try {
     const res = await axios.post(`/api/broadcast/live`, {
@@ -293,7 +304,7 @@ const sendToBroadcast = async () => {
   }
 };
 
-
+// 방송 종료 및 영상 업로드 요청
 const exitBroadcast = async () => {
   try {
     const now = new Date().toISOString()
@@ -338,6 +349,7 @@ const exitBroadcast = async () => {
   }
 };
 
+// 방송 상태 업데이트 API 호출
 const updateBroadcastStatus = async (payload) => {
   try {
     await axios.put('/api/broadcast/status', payload, {
@@ -350,6 +362,7 @@ const updateBroadcastStatus = async (payload) => {
   }
 }
 
+// 방송 페이지 나가기 (팝업 여부에 따라 동작 분기)
 const exitPage = () => {
   if (window.opener) {
     window.close(); // 팝업이라면 창 닫기
@@ -358,6 +371,7 @@ const exitPage = () => {
   }
 }
 
+// 날짜를 MySQL datetime 포맷으로 변환
 function formatDateToMySQL(date) {
   const d = new Date(date)
   const yyyy = d.getFullYear()
@@ -374,17 +388,47 @@ const toggleStreamKey = () => {
   showStreamKey.value = !showStreamKey.value
 }
 
-// 스트림 키 복사
+// 스트림 키 복사 함수 (HTTPS + fallback 대응)
 const copyStreamKey = async () => {
+  const text = stream_key.value  // 복사할 텍스트 값
+
+  // 1. 최신 Clipboard API 사용 (HTTPS 또는 localhost 환경에서만 가능)
+  if (navigator.clipboard && window.isSecureContext) {
+    try {
+      await navigator.clipboard.writeText(text)  // 텍스트 복사 시도
+      alert('✅ 스트림 키 복사 완료!')
+      return  // 성공 시 fallback으로 넘어가지 않음
+    } catch (err) {
+      console.warn('📋 Clipboard API 복사 실패:', err)
+      // 실패 시 fallback으로 넘어감
+    }
+  }
+
+  // 2. Fallback 방식 (구형 브라우저, HTTP, IP주소 접속 등)
   try {
-    await navigator.clipboard.writeText(stream_key.value)
-    alert('스트림 키 복사 완료!')
+    const textarea = document.createElement('textarea')  // textarea 엘리먼트 생성
+    textarea.value = text  // 복사할 텍스트 삽입
+    textarea.style.position = 'fixed'  // 화면 스크롤 방지
+    textarea.style.opacity = '0'       // 안 보이게 숨김
+    document.body.appendChild(textarea)  // DOM에 삽입
+
+    textarea.select()  // 텍스트 선택
+
+    const successful = document.execCommand('copy')  // execCommand 복사 시도
+    document.body.removeChild(textarea)  // 복사 후 textarea 제거
+
+    if (successful) {
+      alert('✅ 스트림 키 복사 완료! (Fallback 방식)')
+    } else {
+      throw new Error('execCommand 실패')
+    }
   } catch (err) {
-    alert('복사 실패')
+    console.error('❌ 복사 실패:', err)
+    alert('❌ 복사 기능을 사용할 수 없는 환경입니다.\n직접 복사해 주세요.')
   }
 }
 
-
+// 페이지 진입 시 방송 ID 세팅 후 데이터 호출
 onMounted(() => {
   broadcast.broadcast_id = parseInt(route.params.broadcast_id)
   console.log("route.params.broadcast_id:", route.params.broadcast_id)
@@ -392,260 +436,4 @@ onMounted(() => {
 })
 </script>
 
-<style scoped>
-.broadcast-page {
-  padding: 24px;
-  font-family: 'Pretendard', 'Noto Sans KR', sans-serif;
-  background-color: #f5f6fa;
-  min-height: 100vh;
-}
-
-.main-content {
-  display: flex;
-  gap: 24px;
-}
-
-/* 좌측: 방송 영상, 정보, 제어 버튼 */
-.left-section {
-  flex: 3;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-.video-section video {
-  width: 100%;
-  height: 550px;
-  background: #000;
-  border-radius: 12px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-.info-section {
-  background-color: #ffffff;
-  padding: 20px;
-  border-radius: 12px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-}
-
-.info-section h2 {
-  margin-bottom: 10px;
-  font-size: 20px;
-  color: #2c3e50;
-}
-
-.info-section p {
-  margin-bottom: 6px;
-  color: #555;
-  font-size: 14px;
-}
-
-.control-buttons {
-  display: flex;
-  gap: 12px;
-}
-
-.control-buttons button {
-  flex: 1;
-  padding: 12px;
-  background-color: #3498db;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: background-color 0.3s;
-}
-
-.control-buttons button:hover {
-  background-color: #2980b9;
-}
-
-/* 우측: 시청자, 상품, 채팅, 제어 */
-.right-section {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  justify-content: flex-start;
-}
-
-.viewer-info {
-  padding: 16px;
-  background-color: #ffffff;
-  border-radius: 12px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.viewer-count-badge {
-  display: flex;
-  align-items: center;
-  background-color: #ecf0f1;
-  padding: 8px 14px;
-  border-radius: 30px;
-  font-weight: bold;
-  font-size: 14px;
-  color: #2c3e50;
-  box-shadow: inset 0 0 4px rgba(0,0,0,0.05);
-}
-
-.viewer-icon {
-  width: 20px;
-  height: 20px;
-  margin-right: 8px;
-  color: #2980b9;
-}
-
-/*.viewer-info,*/
-/* .product-list, */
-/* .chat-box {
-  background-color: #ffffff;
-  padding: 16px;
-  border-radius: 12px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-  font-size: 14px;
-  color: #333;
-} */
-
-.product-list {
-  background-color: #ffffff;
-  padding: 16px;
-  border-radius: 12px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-}
-
-.product-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 10px;
-}
-
-.toggle-button {
-  background: none;
-  border: none;
-  color: #3498db;
-  font-size: 14px;
-  cursor: pointer;
-  font-weight: bold;
-}
-
-.product-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 14px;
-}
-
-.product-table th,
-.product-table td {
-  border: 1px solid #ddd;
-  padding: 10px;
-  text-align: left;
-}
-
-.product-table th {
-  background-color: #f0f3f5;
-  color: #2c3e50;
-}
-
-.chat-box {
-  transition: height 0.3s ease;
-  overflow: hidden;
-}
-
-/* 접힌 상태에서 부모에서 class 내려주기 (예: collapsed 상태 class) */
-.chat-box.collapsed {
-  height: 0;
-  padding: 0;
-  border: none;
-}
-
-.toggle-button {
-  background: none;
-  border: none;
-  color: #3498db;
-  font-size: 14px;
-  cursor: pointer;
-  font-weight: bold;
-}
-
-.chat-content {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-}
-
-/* 방송 제어 버튼 */
-.right-buttons {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.right-buttons .horizontal-buttons {
-  display: flex;
-  gap: 10px;
-}
-
-.right-buttons button {
-  flex: 1;
-  padding: 12px;
-  font-weight: bold;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: background-color 0.3s;
-}
-
-/* 송출/종료 버튼 */
-.right-buttons .horizontal-buttons button:first-child {
-  background-color: #f39c12;
-  color: white;
-}
-
-.right-buttons .horizontal-buttons button:first-child:hover {
-  background-color: #d68910;
-}
-
-.right-buttons .horizontal-buttons button:last-child {
-  background-color: #e74c3c;
-  color: white;
-}
-
-.right-buttons .horizontal-buttons button:last-child:hover {
-  background-color: #c0392b;
-}
-
-/* 나가기 버튼 */
-.exit-btn {
-  background-color: #95a5a6;
-  color: white;
-}
-
-.exit-btn:hover {
-  background-color: #7f8c8d;
-}
-
-/* 공통 폼 그룹 */
-.form-group {
-  margin-bottom: 24px;
-}
-
-.form-group label {
-  display: block;
-  margin-bottom: 8px;
-  font-weight: 600;
-  color: #374151;
-  font-size: 15px;
-}
-
-/* 수평 정렬 그룹 */
-.form-group.horizontal {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
-</style>
+<style scoped src="@/assets/broadcast/broadcastStart.css"></style>
