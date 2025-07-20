@@ -129,4 +129,6 @@ public interface BroadCastDAO {
 	 * @param broadCast 스트림 URL이 포함된 방송 객체
 	 */
 	public void updateStreamUrl(BroadCast broadCast);
+
+	public long countUniqueViewers(int broadcast_id);
 }
