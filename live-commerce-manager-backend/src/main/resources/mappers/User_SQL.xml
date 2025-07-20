@@ -305,8 +305,9 @@
 
 	<!-- 계정 잠금 상태 일괄 업데이트 -->
 	<update id="updateUnlockStatus">
-		UPDATE tb_member
-		SET status = #{status}
+		UPDATE tb_member SET 
+		status = #{status},
+		login_fail_cnt = #{login_fail_cnt}
 		WHERE user_id IN
 		<foreach collection="userIds" item="id" open="(" separator="," close=")">
 			#{id}

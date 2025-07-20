@@ -108,6 +108,7 @@
                 v-model="User.status"
                 true-value="N"
                 false-value="Y"
+                @change="onStatusToggle"
                 />
                 <span class="slider">
                 <span class="slider-label on">OFF</span>
@@ -556,6 +557,12 @@ const visiblePages = computed(() => {
   }
   return pages
 })
+
+const onStatusToggle = () => {
+  if (User.status === 'N') {
+    User.login_fail_cnt = 0;
+  }
+}
 
 function goBack() {
   router.back();
