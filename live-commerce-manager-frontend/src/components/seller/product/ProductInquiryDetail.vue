@@ -11,7 +11,6 @@
 
     <!-- 문의 정보 -->
     <div class="inquiry-info-row">
-      <span class="inquiry-id">{{ inquiry.qnaId }}</span>
       <span class="inquiry-title">{{ inquiry.title }}</span>
       <span class="inquiry-author">{{ inquiry.userId }}</span>
       <span class="inquiry-date">{{ formatDate(inquiry.createdDate) }}</span>

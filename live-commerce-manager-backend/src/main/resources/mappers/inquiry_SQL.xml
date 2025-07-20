@@ -174,9 +174,9 @@
 		P.NAME AS
 		productName
 		FROM
-		TB_PRODUCT_QNA Q
+		tb_product_qna Q
 		JOIN
-		TB_PRODUCT P ON Q.PRODUCT_ID = P.PRODUCT_ID
+		tb_product P ON Q.PRODUCT_ID = P.PRODUCT_ID
 		WHERE
 		P.HOST_ID = #{hostId}
 		AND Q.QNA_STATUS = 'WAITING'

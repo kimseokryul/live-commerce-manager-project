@@ -12,7 +12,6 @@
 
     <!-- 후기 기본 정보 -->
     <div class="review-info-row">
-      <span class="review-id">{{ review.reviewId }}</span>
       <span class="review-author">{{ review.userId }}</span>
       <span class="review-date">{{ formatDate(review.createdDate) }}</span>
 
