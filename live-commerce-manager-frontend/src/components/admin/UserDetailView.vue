@@ -113,7 +113,6 @@
                 <span class="slider">
                 <span class="slider-label on">OFF</span>
                 <span class="slider-label off">ON</span>
-                
                 </span>
             </label>
         </div>
@@ -376,6 +375,10 @@ const getOrderDetail = async(targetUserId) => {
 
 const putUserDetail = async () => {
   try {
+    if (User.status === 'Y'){
+      User.login_fail_cnt = 0;
+    }
+
     console.log('보내는 값:', User.approved_yn); // ✅ 콘솔로 확인
     await axios.put('/api/user-detail', User)
     alert('회원 정보를 수정하였습니다!')

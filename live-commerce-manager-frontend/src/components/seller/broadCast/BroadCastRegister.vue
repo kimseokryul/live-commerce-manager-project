@@ -296,7 +296,7 @@ const handleFileUpload = async (e) => {
       }
     })
     const { url } = res.data
-    thumbnailPreview.value = `http://localhost:8080${url}`
+    thumbnailPreview.value =  `http://3.39.101.58:8081${url}`
     broadcast.thumbnail_url = res.data.url
   } catch(error){
     console.error("썸네일 업로드 실패: ", error)
@@ -306,7 +306,9 @@ const handleFileUpload = async (e) => {
 
 // 이미지 URL 전체 경로 생성
 function getFullImageUrl(path) {
-  return `http://localhost:8080${path}`
+  // return `http://localhost:8080${path}`
+  if (!path) return '/default-image.png';
+  return path.startsWith('http') ? path : `http://3.39.101.58:8081${path}`;
 }
 
 // 컴포넌트 로드시 초기 상품 검색 실행

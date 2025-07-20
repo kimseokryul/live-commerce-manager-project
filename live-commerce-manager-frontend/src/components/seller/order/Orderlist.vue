@@ -373,7 +373,9 @@ const cancelMultiOrder = async () => {
 
 // 이미지 URL 조합 함수
 function getFullImageUrl(path) {
-  return `http://localhost:8080${path}` // 실제 서버 주소에 맞게 수정
+  // return `http://localhost:8080${path}` // 실제 서버 주소에 맞게 수정
+  if (!path) return '/default-image.png';
+  return path.startsWith('http') ? path : `http://3.39.101.58:8081${path}`;
 }
 
 // 컴포넌트 마운트 시 최초 검색 실행

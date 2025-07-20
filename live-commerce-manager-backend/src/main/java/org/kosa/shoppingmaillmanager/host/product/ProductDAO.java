@@ -63,4 +63,6 @@ public interface ProductDAO {
     ProductStatusDto countProductStatus(@Param("hostId") String hostId);
     
 	List<PopularProductDto> findWholePopularProducts();
+	
+	ProductSimpleDTO selectProduct(Integer productId);
 }

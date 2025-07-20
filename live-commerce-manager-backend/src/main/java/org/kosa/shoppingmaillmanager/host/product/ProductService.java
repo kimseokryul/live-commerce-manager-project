@@ -235,4 +235,16 @@ public class ProductService {
 	public List<PopularProductDto> getWholePopularProducts() {
 		return productDAO.findWholePopularProducts();
 	}
+
+	public ProductSimpleDTO getProductDetailForAdmin(Integer productId) {
+		ProductSimpleDTO dto = productDAO.selectProduct(productId);
+		if (dto == null) {
+			throw new NoSuchElementException("상품을 찾을 수 없습니다.");
+		}
+		
+		List<ProductOptionDto> options = productDAO.findOptionsByProductId(productId);
+	    dto.setOptions(options);
+		
+		return dto;
+	}
 }
