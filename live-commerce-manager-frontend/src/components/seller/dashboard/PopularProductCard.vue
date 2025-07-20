@@ -18,9 +18,9 @@ const goToProductDetail = (productId: number) => {
   router.push({ name: 'ProductDetail', params: { productId } })
 }
 
-const getImageUrl = (src: string) => {
-  if (!src) return '/default-image.png'
-  return src.startsWith('http') ? src : `http://localhost:8080${src}`
+function getImageUrl(src) {
+  if (!src) return '/default-image.png';
+  return src.startsWith('http') ? src : `http://3.39.101.58:8081${src}`;
 }
 
 onMounted(async () => {
