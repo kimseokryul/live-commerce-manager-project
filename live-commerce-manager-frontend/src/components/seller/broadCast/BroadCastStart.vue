@@ -116,6 +116,7 @@ import { useRoute, useRouter } from 'vue-router'
 import axios from 'axios'
 import Hls from 'hls.js'
 import SellerChat from '@/components/chat/SellerChat.vue'
+import { useChatStore } from '@/stores/chatStore'
 
 // 방송 정보를 저장하는 reactive 객체 (broadcast_id, 제목, 설명 등)
 const broadcast = reactive({
@@ -144,6 +145,9 @@ const videoRef = ref(null)       // video 태그 참조
 // 라우터 및 현재 URL 정보
 const router = useRouter()
 const route = useRoute()
+
+const chatStore = useChatStore()
+
 
 // 로그인 시 저장된 JWT 토큰 가져오기
 const token = ref(localStorage.getItem('jwt') || sessionStorage.getItem('jwt'))
