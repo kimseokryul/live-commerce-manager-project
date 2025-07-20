@@ -83,7 +83,7 @@ const routes = [
   { path: '/admin/user-detail/:user_id', name: 'UserDetail', component: UserDetail, props: true},
 
   { path: '/admin/user-detail/:user_id', name: 'UserDetail', component: UserDetail, props: true},
-  { path: '/product/admin/:productId', name: 'AdminProductDetail', component : AdminProductDetailMain, props: true },
+  { path: '/products/admin/:productId', name: 'AdminProductDetail', component : AdminProductDetailMain, props: true },
 ]
 
 const router = createRouter({
