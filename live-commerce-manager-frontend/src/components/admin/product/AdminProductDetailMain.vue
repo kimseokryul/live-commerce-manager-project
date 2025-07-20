@@ -161,7 +161,7 @@ async function fetchProduct() {
     const token = sessionStorage.getItem('jwt') || localStorage.getItem('jwt');
 
 
-    const res = await axios.get(`/api/products/${numericProductId.value}`, {
+    const res = await axios.get(`/api/products/admin/${numericProductId.value}`, {
       headers: {
         Authorization: `Bearer ${token}`
       }
