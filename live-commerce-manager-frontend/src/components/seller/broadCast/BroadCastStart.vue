@@ -56,12 +56,16 @@
       <div class="right-section">
 
         <!-- 시청자 수 뱃지 -->
-        <div class="viewer-info">
+        <!-- <div class="viewer-info">
           <div class="viewer-count-badge">
-            <svg class="viewer-icon">...</svg>
+           <svg class="viewer-icon">...</svg>
+            <svg xmlns="http://www.w3.org/2000/svg" class="viewer-icon" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 5c-7 0-10 7-10 7s3 7 10 7 10-7 10-7-3-7-10-7zm0 12a5 5 0 110-10 5 5 0 010 10z"/>
+              <circle cx="12" cy="12" r="2.5" fill="#fff"/>
+            </svg>
             <span class="viewer-count">{{ broadcast.current_viewers }}명 시청 중</span>
           </div>
-        </div>
+        </div> -->
 
         <!-- 상품 목록 -->
         <div class="product-list">
@@ -337,7 +341,7 @@ const exitBroadcast = async () => {
 
     // 4. 성공 처리
     if (res.data.status === 'success') {
-      alert("방송 종료 및 다시보기가 등록되었습니다!");
+      alert("방송이 종료 되었습니다!");
       broadcast.stream_url = res.data.stream_url;
     } else {
       alert("방송 종료 실패: " + res.data.message);
@@ -396,7 +400,7 @@ const copyStreamKey = async () => {
   if (navigator.clipboard && window.isSecureContext) {
     try {
       await navigator.clipboard.writeText(text)  // 텍스트 복사 시도
-      alert('✅ 스트림 키 복사 완료!')
+      alert('스트림 키 복사 완료!')
       return  // 성공 시 fallback으로 넘어가지 않음
     } catch (err) {
       console.warn('📋 Clipboard API 복사 실패:', err)
@@ -418,7 +422,7 @@ const copyStreamKey = async () => {
     document.body.removeChild(textarea)  // 복사 후 textarea 제거
 
     if (successful) {
-      alert('✅ 스트림 키 복사 완료! (Fallback 방식)')
+      alert('스트림 키 복사 완료!')
     } else {
       throw new Error('execCommand 실패')
     }

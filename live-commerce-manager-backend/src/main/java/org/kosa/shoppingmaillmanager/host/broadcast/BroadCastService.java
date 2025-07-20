@@ -148,8 +148,8 @@ public class BroadCastService {
 	 * - DB 저장 + Redis 실시간 시청자 수 증가
 	 */
 	public void onViewerJoined(int broadcastId, BroadCastViewer viewer) {
-		broadCastDAO.insertViewer(viewer);
-		redisService.increase(broadcastId);
+//	    broadCastDAO.insertViewer(viewer);           // DB에 "입장" 기록 남기기
+	    redisService.increase(broadcastId);          // Redis 시청자 수 +1
 	}
 
 	/**
@@ -157,8 +157,8 @@ public class BroadCastService {
 	 * - 퇴장 시간 기록 + Redis 시청자 수 감소
 	 */
 	public void onViewerLeft(int broadcast_id, String user_id) {
-		broadCastDAO.updateLeftTime(user_id, broadcast_id);
-		redisService.decrease(broadcast_id);
+		broadCastDAO.updateLeftTime(user_id, broadcast_id); // DB에 "퇴장" 기록 남기기
+		redisService.decrease(broadcast_id); // Redis 시청자 수 -1
 	}
 
 	/**
@@ -166,7 +166,8 @@ public class BroadCastService {
 	 * - Redis에 저장된 최종 시청자 수를 DB에 저장 + 캐시 제거
 	 */
 	public void onBroadcastEnd(int broadcast_id) {
-		long total = redisService.getCount(broadcast_id);
+//		long total = redisService.getCount(broadcast_id); // 중복 없이 카운트
+		long total = broadCastDAO.countUniqueViewers(broadcast_id); // 중복 없이 카운트
 		broadCastDAO.updateTotalViewersManual(broadcast_id, total);
 		redisService.remove(broadcast_id); // 캐시 제거
 	}

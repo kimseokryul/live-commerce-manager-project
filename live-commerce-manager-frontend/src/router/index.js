@@ -33,7 +33,7 @@ import SellerSales from '../components/seller/sales/SellerSales.vue'
 
 import AdminDashboard from '../components/seller/AdminDashboard.vue'
 import AdminSellerSales from '../components/admin/sales/AdminSellerSales.vue'
-
+import AdminProductDetailMain from '../components/admin/product/AdminProductDetailMain.vue'
 
 const Login = () => import('@/components/login/Login.vue')
 const Register = () => import('@/components/host/register.vue')
@@ -81,6 +81,9 @@ const routes = [
   { path: '/admin/user-list/widthdrawn', name: 'WidthdrawnUserList', component: WidthdrawnUserList, props: true},
   { path: '/admin/user-list/host', name: 'HostList', component: HostList, props: true},
   { path: '/admin/user-detail/:user_id', name: 'UserDetail', component: UserDetail, props: true},
+
+  { path: '/admin/user-detail/:user_id', name: 'UserDetail', component: UserDetail, props: true},
+  { path: '/product/admin/:productId', name: 'AdminProductDetail', component : AdminProductDetailMain, props: true },
 ]
 
 const router = createRouter({
