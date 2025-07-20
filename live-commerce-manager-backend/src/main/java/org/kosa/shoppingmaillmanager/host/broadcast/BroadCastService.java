@@ -331,46 +331,51 @@ public class BroadCastService {
 	 * 
 	 * @throws Exception
 	 */
-	
+	public void stopRecording(int broadcast_id) throws Exception {
+	    withOBSClient(broadcast_id, client -> {
+	        client.sendRequest(StopRecordRequest.builder().build(),
+	            res -> log.info("⏹ 녹화 종료 응답: {}", res));
+	    });
+	}
 	// 방송 녹화 종료 메서드 (broadcast_id는 방송 고유 번호)
-		public void stopRecording(int broadcast_id) throws Exception {
-		    withOBSClient(broadcast_id, client -> {
-		        client.sendRequest(StopRecordRequest.builder().build(), // 1.. OBS에 '녹화 중지' 명령 요청 생성
-						response -> { // 2. WebSocket을 통해 응답이 비동기로 들어옴 (Consumer<RequestResponse<?>>)
-							
-							log.info("⏹ 녹화 종료 응답: {}", response);
-		        
-							var messageData = response.getMessageData(); // 3. 응답에서 messageData 객체 추출
-							if (messageData == null) {
-								// 4. 응답 본문이 없을 경우 로그 찍고 리턴
-								log.warn("⚠️ 응답에 데이터가 없습니다.");
-								return;
-							}
-
-							Object responseData = messageData.getResponseData(); // 5. 실제 응답 데이터 추출 (Map 형태로 들어옴)
-
-							log.info("🔎 응답 데이터 타입: {}", responseData.getClass().getName());
-							log.info("📦 응답 데이터 내용: {}", responseData);
-
-	            		//  여기서 타입 캐스팅
-	            	        if (responseData instanceof StopRecordResponse.SpecificData data) {
-	            	            String outputPath = data.getOutputPath();
-	            	           
-
-	            	            try {
-//	            	                uploadToSpringServer(outputPath, broadcast_id);
-	            	               log.info("📁 녹화 파일 경로: {}", outputPath);
-	            	            } catch (Exception e) {
-	            	                log.error("❌ 업로드 실패", e);
-	            	            }
-	            	        } else {
-	            	            log.warn("⚠️ 예상치 못한 응답 형식: {}", responseData);
-	            	        }
-	            		   
-	            		 }
-	            	);
-		    });
-		}
+//		public void stopRecording(int broadcast_id) throws Exception {
+//		    withOBSClient(broadcast_id, client -> {
+//		        client.sendRequest(StopRecordRequest.builder().build(), // 1.. OBS에 '녹화 중지' 명령 요청 생성
+//						response -> { // 2. WebSocket을 통해 응답이 비동기로 들어옴 (Consumer<RequestResponse<?>>)
+//							
+//							log.info("⏹ 녹화 종료 응답: {}", response);
+//		        
+//							var messageData = response.getMessageData(); // 3. 응답에서 messageData 객체 추출
+//							if (messageData == null) {
+//								// 4. 응답 본문이 없을 경우 로그 찍고 리턴
+//								log.warn("⚠️ 응답에 데이터가 없습니다.");
+//								return;
+//							}
+//
+//							Object responseData = messageData.getResponseData(); // 5. 실제 응답 데이터 추출 (Map 형태로 들어옴)
+//
+//							log.info("🔎 응답 데이터 타입: {}", responseData.getClass().getName());
+//							log.info("📦 응답 데이터 내용: {}", responseData);
+//
+//	            		//  여기서 타입 캐스팅
+//	            	        if (responseData instanceof StopRecordResponse.SpecificData data) {
+//	            	            String outputPath = data.getOutputPath();
+//	            	           
+//
+//	            	            try {
+////	            	                uploadToSpringServer(outputPath, broadcast_id);
+//	            	               log.info("📁 녹화 파일 경로: {}", outputPath);
+//	            	            } catch (Exception e) {
+//	            	                log.error("❌ 업로드 실패", e);
+//	            	            }
+//	            	        } else {
+//	            	            log.warn("⚠️ 예상치 못한 응답 형식: {}", responseData);
+//	            	        }
+//	            		   
+//	            		 }
+//	            	);
+//		    });
+//		}
 
 		/**
 		 * 🔁 방송 스트림 URL 변경 (필요 시 수동 갱신)

@@ -183,11 +183,19 @@ public class ProductRestController {
         return ResponseEntity.ok(result);
     }
     
+    @Operation(summary = "전체 인기 상품 조회", description = "등록한 전체 상품 중 인기 상품을 조회합니다.", tags = {"전체 매출 현황 및 대시보드 API"})
     @GetMapping("/dashboard/admin/popular")
     public ResponseEntity<List<PopularProductDto>> getWholePopularProducts(HttpServletRequest request) {
 
         List<PopularProductDto> result = productService.getWholePopularProducts();
         return ResponseEntity.ok(result);
+    }
+    
+    @Operation(summary = "상품 상세 조회 (관리자)", description = "상품 ID로 상세 정보를 조회합니다. (조건 없음)")
+    @GetMapping("/admin/{productId}")
+    public ResponseEntity<ProductSimpleDTO> getProductDetailForAdmin(@PathVariable Integer productId) {
+        ProductSimpleDTO dto = productService.getProductDetailForAdmin(productId);
+        return ResponseEntity.ok(dto);
     }
 }
 
