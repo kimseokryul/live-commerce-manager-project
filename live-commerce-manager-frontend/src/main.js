@@ -4,6 +4,7 @@ import '../init'
 import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router'
+import { createPinia } from 'pinia'
 
 // import 'bootstrap/dist/css/bootstrap.min.css'
 // import 'bootstrap-icons/font/bootstrap-icons.css'
@@ -50,6 +51,7 @@ axios.interceptors.request.use(config => {
 })
 
 const app = createApp(App)
+app.use(createPinia())
 app.use(router)
 
 // 라우터 준비 완료 후에 마운트
