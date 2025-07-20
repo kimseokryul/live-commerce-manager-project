@@ -2,7 +2,7 @@
   <div class="chat-container">
     <!-- 상단 툴바 -->
     <div class="chat-topbar">
-      <span class="chat-participant-count">👥 {{ chatStore.participantCount }}명 참여중</span>
+      <span class="chat-participant-count">👥 {{ participantCount }}명 참여중</span>
       <button class="notice-toggle-btn" @click="toggleNotice">
         📢 {{ isNoticeExpanded ? '공지 숨기기' : '라이브 공지사항 보기' }}
       </button>
@@ -138,7 +138,7 @@ import axios from 'axios';
 import { userState } from './UserState';
 import { getOrCreateUUID } from '@/components/common/uuid.js';
 import CustomAlert from '@/components/common/CustomAlert.vue';
-import { useChatStore } from '@/stores/chatStore'
+
 
 
 const props = defineProps({
@@ -178,7 +178,7 @@ const hasInitialParticipantSet = ref(false);
 const showContextMenu = ref(false);
 const contextMenuPos = ref({ x: 0, y: 0 });
 const selectedMsg = ref(null);
-const chatStore = useChatStore();
+
 
 let chatSubscription = null;
 
@@ -220,7 +220,7 @@ const stompClient = new Client({
        return;
      }
 
-      chatStore.setParticipantCount(isNaN(count) ? 0 : count);
+      participantCount.value = isNaN(count) ? 0 : count;
     });
 
     // 📌 채팅 금지 STOMP 채널 구독
