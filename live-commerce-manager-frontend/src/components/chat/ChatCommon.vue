@@ -2,7 +2,7 @@
   <div class="chat-container">
     <!-- 상단 툴바 -->
     <div class="chat-topbar">
-      <span class="chat-participant-count">👥 {{ participantCount }}명 참여중</span>
+      <span class="chat-participant-count">👥 시청자{{ participantCount }}명</span>
       <button class="notice-toggle-btn" @click="toggleNotice">
         📢 {{ isNoticeExpanded ? '공지 숨기기' : '라이브 공지사항 보기' }}
       </button>
@@ -140,6 +140,7 @@ import { getOrCreateUUID } from '@/components/common/uuid.js';
 import CustomAlert from '@/components/common/CustomAlert.vue';
 
 
+
 const props = defineProps({
   class: String,
   broadcastId: String,
@@ -178,6 +179,7 @@ const showContextMenu = ref(false);
 const contextMenuPos = ref({ x: 0, y: 0 });
 const selectedMsg = ref(null);
 
+
 let chatSubscription = null;
 
 
@@ -213,10 +215,10 @@ const stompClient = new Client({
 
       console.log('🧪 uuid:', uuid);
 
-    if (!hasInitialParticipantSet.value) {
-      console.log('🧪 초기 API 수신 전이라 STOMP 반영 안 함');
-       return;
-     }
+    // if (!hasInitialParticipantSet.value) {
+    //   console.log('🧪 초기 API 수신 전이라 STOMP 반영 안 함');
+    //    return;
+    //  }
 
       participantCount.value = isNaN(count) ? 0 : count;
     });
