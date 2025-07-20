@@ -59,7 +59,7 @@
         <div class="viewer-info">
           <div class="viewer-count-badge">
             <svg class="viewer-icon">...</svg>
-            <span class="viewer-count">{{ broadcast.current_viewers }}명 시청 중</span>
+            <span class="viewer-count">{{ chatStore.participantCount }}명 시청 중</span>
           </div>
         </div>
 
