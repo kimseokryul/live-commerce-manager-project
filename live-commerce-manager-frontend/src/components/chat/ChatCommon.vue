@@ -2,7 +2,7 @@
   <div class="chat-container">
     <!-- 상단 툴바 -->
     <div class="chat-topbar">
-      <span class="chat-participant-count">👥 {{ participantCount }}명 참여중</span>
+      <span class="chat-participant-count">👥 시청자{{ participantCount }}명</span>
       <button class="notice-toggle-btn" @click="toggleNotice">
         📢 {{ isNoticeExpanded ? '공지 숨기기' : '라이브 공지사항 보기' }}
       </button>
