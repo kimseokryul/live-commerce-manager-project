@@ -14,13 +14,17 @@ interface PopularProduct {
 
 const popularProducts = ref<PopularProduct[]>([])
 
+// const goToProductDetail = (productId: number) => {
+//   router.push({ name: 'ProductDetail', params: { productId } })
+// }
+
 const goToProductDetail = (productId: number) => {
-  router.push({ name: 'ProductDetail', params: { productId } })
+  router.push(`/products/admin/${productId}`)
 }
 
 const getImageUrl = (src: string) => {
   if (!src) return '/default-image.png'
-  return src.startsWith('http') ? src : `http://localhost:8080${src}`
+  return src.startsWith('http') ? src : `http://3.39.101.58:8081${src}`;
 }
 
 onMounted(async () => {

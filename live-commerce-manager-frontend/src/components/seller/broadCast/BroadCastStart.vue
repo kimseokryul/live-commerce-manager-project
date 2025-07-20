@@ -327,13 +327,13 @@ const exitBroadcast = async () => {
     });
 
     // 3. 업로드 요청도 여기서 같이 실행 (서버 쪽 OBS 연동이 됐을 경우)
-    await axios.post(`/api/broadcast/video/upload`, {
-      broadcast_id: broadcast.broadcast_id
-    }, {
-      headers: {
-        Authorization: `Bearer ${token.value}`
-      }
-    });
+    // await axios.post(`/api/broadcast/video/upload`, {
+    //   broadcast_id: broadcast.broadcast_id
+    // }, {
+    //   headers: {
+    //     Authorization: `Bearer ${token.value}`
+    //   }
+    // });
 
     // 4. 성공 처리
     if (res.data.status === 'success') {

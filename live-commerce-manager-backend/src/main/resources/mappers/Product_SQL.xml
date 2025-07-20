@@ -352,4 +352,46 @@
   WHERE host_id = #{hostId}
 </select>
 
+<select id="selectProduct"
+		resultType="org.kosa.shoppingmaillmanager.host.product.dto.ProductSimpleDTO"
+		parameterType="map">
+		SELECT
+		p.product_id AS productId,
+		p.name,
+		p.price,
+		p.sale_price AS salePrice,
+		p.stock,
+		p.category_id AS categoryId,
+		p.product_short_description AS productShortDescription,
+		p.product_status AS productStatus,
+		p.display_yn AS displayYn,
+		p.main_image AS mainImage,
+		p.product_review_count AS
+		productReviewCount,
+		p.view_count AS
+		viewCount,
+		p.PRODUCT_DESCRIPTION AS
+		productDescription,
+		p.created_date AS createdDate,
+		p.updated_date AS
+		updatedDate,
+		c1.name AS mainCategoryName,
+		c2.name AS subCategoryName,
+		(
+		SELECT
+		IFNULL(SUM(oi.quantity), 0)
+		FROM tb_order_item oi
+		WHERE
+		oi.product_id =
+		p.product_id
+		) AS productSalesCount
+		FROM tb_product p
+		LEFT JOIN
+		tb_category c2 ON p.category_id = c2.category_id
+		LEFT JOIN
+		tb_category
+		c1 ON c2.parent_category_id = c1.category_id
+		WHERE p.product_id = #{productId}
+	</select>
+
 </mapper>
