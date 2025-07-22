@@ -496,7 +496,7 @@ const isAdminViewingOtherUser = computed(() => {
 
 
 const isMyPage = computed(() => {
-  return targetUserId.value === userId.value
+  return String(targetUserId.value) === String(userId.value)
 })
 
 
@@ -579,8 +579,8 @@ onMounted(async () => {
   if (targetUserId.value) {
     User.user_id = targetUserId.value
     Order.user_id = targetUserId.value
-    getUserDetail(targetUserId.value)
-    getOrderDetail(targetUserId.value)
+    await getUserDetail(targetUserId.value)
+    await getOrderDetail(targetUserId.value)
   } else {
     alert('user_id가 없습니다.')
   }
