@@ -112,7 +112,7 @@
 			#{stream_url}, 
 			#{thumbnail_url},
 			#{is_public},
-			#{broadcast_status}, 
+			'scheduled', 
 			#{scheduled_start_time}, 
 			#{scheduled_end_time}, 
 			now(),
