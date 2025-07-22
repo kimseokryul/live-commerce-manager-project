@@ -94,7 +94,7 @@ function formatDate(dateStr) {
 function getFullImageUrl(path) {
   if (!path) return '';
   if (path.startsWith('http')) return path;
-  return `http://localhost:8080${path}`;
+  return `http://3.39.101.58:8081${path}`; // ✅ 배포 주소로 변경
 }
 
 async function fetchReview() {
