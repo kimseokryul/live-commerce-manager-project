@@ -200,7 +200,7 @@ const broadcast = reactive({
   category_id: '',
   thumbnail_url: '',
   is_public: '', // 공개 여부
-  broadcast_status: '',
+  broadcast_status: 'scheduled',
   scheduled_start_time: '',
   scheduled_end_time: '',
   obs_host: '',
