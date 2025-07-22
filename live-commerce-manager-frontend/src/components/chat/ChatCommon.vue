@@ -215,10 +215,10 @@ const stompClient = new Client({
 
       console.log('🧪 uuid:', uuid);
 
-    if (!hasInitialParticipantSet.value) {
-      console.log('🧪 초기 API 수신 전이라 STOMP 반영 안 함');
-       return;
-     }
+    // if (!hasInitialParticipantSet.value) {
+    //   console.log('🧪 초기 API 수신 전이라 STOMP 반영 안 함');
+    //    return;
+    //  }
 
       participantCount.value = isNaN(count) ? 0 : count;
     });

@@ -49,9 +49,43 @@
           <input type="text" v-model="broadcast.obs_host" placeholder="OBS를 사용할 PC의 IP를 입력해주세요" />
         </div>
 
-        <div class="form-group">
+        <!-- <div class="form-group">
           <label>OBS Websocket 포트 번호</label>
           <input type="text" v-model="broadcast.obs_port" placeholder="OBS WebSocket을 연결할 포트번호를 입력해주세요" />
+        </div> -->
+
+        <div class="form-group" style="position: relative;">
+          <label>
+            OBS Websocket 포트 번호
+            <button @click="showObsPortHelp = true" style="margin-left: 8px; font-size: 0.85em;">도움말</button>
+          </label>
+          <input
+            type="text"
+            v-model="broadcast.obs_port"
+            placeholder="OBS WebSocket을 연결할 포트번호를 입력해주세요"
+          />
+
+          <!-- 모달 (도움말 창) -->
+          <div v-if="showObsPortHelp" class="modal-overlay">
+            <div class="modal-content">
+              <h3>OBS WebSocket 방화벽 포트 설정 방법</h3>
+              <p>
+                이 포트를 사용자가 접근할 수 있도록 운영체제 방화벽과 클라우드 인스턴스(예: AWS)의 보안 그룹에서 <strong>TCP 4455 포트</strong>를 허용해야 합니다.
+              </p>
+              <ol>
+                <li><strong>Windows 방화벽</strong> <br/>
+                  (1) 제어판 → 시스템 및 보안 → Windows Defender 방화벽 → 왼쪽 메뉴에서 고급 설정 클릭 <br/>
+                  (2) 왼쪽 탭의 인바운드 규칙 선택 → 오른쪽 탭의 새 규칙 클릭 <br/>
+                  (3) 포트 선택 → TCP 선택 + 특정 로컬 포트 입력 : 4455  <br/>
+                  (4) 연결 허용 선택 → 프로파일(도메인/개인/공용) 원하는 대로 선택 <br/>
+                  (5) 이름 입력 (예 : OBS Websocket 4455) → 완료 </li>
+                <li><strong>Linux(UFW)</strong>: <code>sudo ufw allow 4455/tcp</code></li>
+                <li><strong>AWS</strong>: EC2 → 보안 그룹 → 인바운드 규칙 추가 (TCP 4455)</li>
+              </ol>
+              <!-- <img src="/path/to/your/help-image.png" alt="포트 설정 예시" style="max-width: 100%; margin-top: 10px;" /> -->
+              <button @click="showObsPortHelp = false" style="margin-top: 10px;">닫기</button>
+            </div>
+          </div>
         </div>
 
         <!-- OBS WebSocket 비밀번호 입력 (눈 아이콘으로 가림/보임 전환) -->
@@ -172,7 +206,7 @@ const broadcast = reactive({
   obs_host: '',
   obs_port: '4455',
   obs_password: '',
-  nginx_host: '',
+  nginx_host: '3.39.101.58',
   productList: [], // 선택된 상품 리스트
 })
 
@@ -182,6 +216,9 @@ const thumbnailPreview = ref('')
 // 상품 검색 키워드 및 결과 리스트
 const searchKeyword = ref('')
 const searchResults = ref([])
+
+// 도움말 팝업 보기/숨기기 토글 상태
+const showObsPortHelp = ref(false)
 
 // 로그인 토큰
 const token = localStorage.getItem('jwt') || sessionStorage.getItem('jwt')
@@ -296,7 +333,7 @@ const handleFileUpload = async (e) => {
       }
     })
     const { url } = res.data
-    thumbnailPreview.value = `http://localhost:8080${url}`
+    thumbnailPreview.value =  `http://3.39.101.58:8081${url}`
     broadcast.thumbnail_url = res.data.url
   } catch(error){
     console.error("썸네일 업로드 실패: ", error)
@@ -306,7 +343,9 @@ const handleFileUpload = async (e) => {
 
 // 이미지 URL 전체 경로 생성
 function getFullImageUrl(path) {
-  return `http://localhost:8080${path}`
+  // return `http://localhost:8080${path}`
+  if (!path) return '/default-image.png';
+  return path.startsWith('http') ? path : `http://3.39.101.58:8081${path}`;
 }
 
 // 컴포넌트 로드시 초기 상품 검색 실행
@@ -521,5 +560,25 @@ button:hover {
 }
 .password-wrapper input {
   flex: 1;
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+.modal-content {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  max-width: 400px;
 }
 </style>

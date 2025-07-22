@@ -329,7 +329,9 @@ const searchAddress = async () => {
 
 // 이미지 URL 전체 경로 생성 함수
 function getFullImageUrl(path) {
-  return `http://localhost:8080${path}` // 서버 주소와 맞게 조정 필요
+  // return `http://localhost:8080${path}` // 서버 주소와 맞게 조정 필요
+  if (!path) return '/default-image.png';
+  return path.startsWith('http') ? path : `http://3.39.101.58:8081${path}`;
 }
 
 // 페이지가 마운트될 때 실행되는 초기 함수

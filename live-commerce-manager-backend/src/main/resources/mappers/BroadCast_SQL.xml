@@ -343,4 +343,10 @@
 	    )
 	    WHERE broadcast_id = #{broadcast_id}
 	</update>
+	
+	<select id="countUniqueViewers" parameterType="int" resultType="long">
+	  SELECT COUNT(DISTINCT user_id)
+	  FROM tb_broadcast_viewer
+	  WHERE broadcast_id = #{broadcast_id}
+	</select>
 </mapper>

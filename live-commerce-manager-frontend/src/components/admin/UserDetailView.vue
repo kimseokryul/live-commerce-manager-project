@@ -113,7 +113,6 @@
                 <span class="slider">
                 <span class="slider-label on">OFF</span>
                 <span class="slider-label off">ON</span>
-                
                 </span>
             </label>
         </div>
@@ -162,7 +161,7 @@
         <div class="form-group">
           <label>탈퇴 하기</label>
           <div class="radio-group">
-              <button class="force-withdraw-btn" @click="forceWithdraw">회원 탈퇴하기</button>
+              <button class="force-withdraw-btn" @click="withdrawMyAccount">회원 탈퇴하기</button>
           </div>
         </div>
     </div>
@@ -376,6 +375,10 @@ const getOrderDetail = async(targetUserId) => {
 
 const putUserDetail = async () => {
   try {
+    if (User.status === 'Y'){
+      User.login_fail_cnt = 0;
+    }
+
     console.log('보내는 값:', User.approved_yn); // ✅ 콘솔로 확인
     await axios.put('/api/user-detail', User)
     alert('회원 정보를 수정하였습니다!')
@@ -430,21 +433,33 @@ const forceWithdraw = async () => {
       params: { secession_yn: 'Y' }
     })
     alert(res.data || '탈퇴 처리 완료되었습니다.')
-     // 사용자 정보 다시 불러오기
-    // await getUserDetail()
-    
-     // 마이페이지일 경우, 로그아웃 후 로그인 페이지로 이동
-      if (isMyPage) {
-      // 토큰 삭제 (localStorage, sessionStorage 모두)
-      localStorage.removeItem('jwt')
-      sessionStorage.removeItem('jwt')
+    // 강제 탈퇴 후, 목록으로 이동
+    router.push({ name: 'UserList' })
+  } catch (e) {
+    console.error('❌ 탈퇴 실패:', e)
+    alert('탈퇴 처리 중 오류가 발생했습니다.')
+  }
+}
 
-      // 로그인 페이지로 이동
-      router.push('/login')
-    } else {
-      // ✅ 관리자일 경우, 사용자 정보 새로고침
-      // await getUserDetail()
-    }
+const withdrawMyAccount = async () => {
+  const confirm1 = window.confirm('정말로 탈퇴하시겠습니까?')
+  if (!confirm1) return
+
+  const confirm2 = window.confirm('이 작업은 되돌릴 수 없습니다. 계속하시겠습니까?')
+  if (!confirm2) return
+
+  try {
+    const token = localStorage.getItem('jwt') || sessionStorage.getItem('jwt')
+    const res = await axios.put(`/api/admin/user/secession/${userId.value}`, null, {
+      params: { secession_yn: 'Y' },
+      headers: { Authorization: `Bearer ${token}` }
+    })
+    alert(res.data || '탈퇴 처리 완료되었습니다.')
+
+    // 로그아웃
+    localStorage.removeItem('jwt')
+    sessionStorage.removeItem('jwt')
+    router.push('/login')
   } catch (e) {
     console.error('❌ 탈퇴 실패:', e)
     alert('탈퇴 처리 중 오류가 발생했습니다.')
@@ -493,7 +508,7 @@ const isAdminViewingOtherUser = computed(() => {
 
 
 const isMyPage = computed(() => {
-  return targetUserId.value === userId.value
+  return String(targetUserId.value) === String(userId.value)
 })
 
 
@@ -576,8 +591,8 @@ onMounted(async () => {
   if (targetUserId.value) {
     User.user_id = targetUserId.value
     Order.user_id = targetUserId.value
-    getUserDetail(targetUserId.value)
-    getOrderDetail(targetUserId.value)
+    await getUserDetail(targetUserId.value)
+    await getOrderDetail(targetUserId.value)
   } else {
     alert('user_id가 없습니다.')
   }
